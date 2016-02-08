@@ -1,4 +1,4 @@
-package in.mobileappdev.project1;
+package in.mobileappdev.moviesdb;
 
 import org.junit.Test;
 
