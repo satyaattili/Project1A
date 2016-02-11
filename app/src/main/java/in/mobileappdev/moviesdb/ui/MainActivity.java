@@ -8,11 +8,13 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.adapters.MovieGridAdapter;
@@ -58,15 +60,31 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         CallMoviesAPI  service = retrofit.create(CallMoviesAPI.class);
-        service.getMovies(Constants.API_KEY).enqueue(new Callback<Movie>() {
+        /*service.getMovies().enqueue(new Callback<Movie>() {
             @Override
             public void onResponse(Call<Movie> call, Response<Movie> response) {
-                Log.e(TAG, "onResponse");
+                Log.e(TAG, "onResponse "+response);
+                Toast.makeText(MainActivity.this, "onResponse"+response.body(), Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(Call<Movie> call, Throwable t) {
                 Log.e(TAG, "onFailure");
+                Toast.makeText(MainActivity.this, "onFailure", Toast.LENGTH_SHORT).show();
+            }
+        });*/
+
+        service.getMovies(new Callback<List<Movie>>() {
+            @Override
+            public void onResponse(Call<List<Movie>> call, Response<List<Movie>> response) {
+                Log.e(TAG, "onResponse "+response);
+                Toast.makeText(MainActivity.this, "onResponse"+response.body(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<List<Movie>> call, Throwable t) {
+                Log.e(TAG, "onFailure");
+                Toast.makeText(MainActivity.this, "onFailure", Toast.LENGTH_SHORT).show();
             }
         });
 
