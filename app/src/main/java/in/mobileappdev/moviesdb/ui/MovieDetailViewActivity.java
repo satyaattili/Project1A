@@ -121,7 +121,7 @@ public class MovieDetailViewActivity extends AppCompatActivity {
       mMovieStatusCard.setCardBackgroundColor(getResources().getColor(R.color.md_orange_800));
     }
     double voting = movie.getVote_average();
-    mVoting.setText(String.valueOf(voting));
+    mVoting.setText(String.valueOf(voting)+"/10");
     if(voting<=4){
       mMovieVotingCard.setCardBackgroundColor(getResources().getColor(R.color.md_red_800));
     }else if(voting>4 && voting<7.5){
@@ -129,6 +129,7 @@ public class MovieDetailViewActivity extends AppCompatActivity {
     }else if(voting>=7.5){
       mMovieVotingCard.setCardBackgroundColor(getResources().getColor(R.color.md_green_800));
     }
+
   }
 
 }

@@ -128,10 +128,6 @@
 
             </LinearLayout>
 
-
-
-
-
            <!-- <View android:layout_width="match_parent" android:layout_height="1dp"
                   android:background="@android:color/darker_gray"/>-->
 
@@ -149,9 +145,8 @@
                     android:id="@+id/movie_overview"
                     android:textSize="15sp"
                     android:layout_gravity="center_vertical"
-                    android:gravity="center"
-                    android:padding="10dp"
-                    />
+                    android:gravity="start"
+                    android:padding="10dp"/>
             </android.support.v7.widget.CardView>
 
 
@@ -159,7 +154,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-                
             </LinearLayout>
 
         </LinearLayout>

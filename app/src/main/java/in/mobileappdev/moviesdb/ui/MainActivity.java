@@ -33,10 +33,10 @@ import retrofit2.Retrofit;
 public class MainActivity extends AppCompatActivity implements Callback<MovieResponse>{
 
     private static final String TAG = MainActivity.class.getSimpleName() ;
-    ArrayList<Result> movies = new ArrayList<>();
+    private ArrayList<Result> movies = new ArrayList<>();
     private ProgressBar mProgressBar;
     private MovieGridAdapter mMovieAdapter;
-    CallMoviesAPI  service;
+    private CallMoviesAPI  mApiService;
   @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
             startActivity(detailsActivity);
           }
         });
+
         movieList.setAdapter(mMovieAdapter);
 
         Gson gson = new GsonBuilder()
@@ -70,25 +71,9 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
-        service = retrofit.create(CallMoviesAPI.class);
+        mApiService = retrofit.create(CallMoviesAPI.class);
         mProgressBar.setVisibility(View.VISIBLE);
-        service.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
-
-       /* service.getMovies(new Callback<List<MovieResponse>>() {
-            @Override
-            public void onResponse(Call<List<MovieResponse>> call, Response<List<MovieResponse>> response) {
-                Log.e(TAG, "onResponse "+response);
-                Toast.makeText(MainActivity.this, "onResponse"+response.body(), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailure(Call<List<MovieResponse>> call, Throwable t) {
-                Log.e(TAG, "onFailure");
-                Toast.makeText(MainActivity.this, "onFailure", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-*/
+        mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
 
     }
 
@@ -103,13 +88,13 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
       mProgressBar.setVisibility(View.VISIBLE);
         int id = item.getItemId();
         if (id == R.id.action_popular) {
-            service.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
-            return true;
+          mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
+          return true;
         }else if (id == R.id.action_latest){
-            service.getLatestMovies(Constants.API_KEY).enqueue(this);
-            return true;
+          mApiService.getLatestMovies(Constants.API_KEY).enqueue(this);
+          return true;
         }else if(id==R.id.action_toprated){
-          service.getTopRatedtMovies(Constants.API_KEY).enqueue(this);
+          mApiService.getTopRatedtMovies(Constants.API_KEY).enqueue(this);
           return true;
         }
 
