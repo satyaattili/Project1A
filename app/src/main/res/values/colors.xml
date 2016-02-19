@@ -3,4 +3,11 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="md_green_800">#2E7D32</color>
+    <color name="md_orange_800">#FB8C00</color>
+    <color name="md_red_800">#D50000</color>
+
+
+
 </resources>
