@@ -6,13 +6,17 @@ package in.mobileappdev.moviesdb.models;
 public class Movie {
 
     private long id;
-    private String movieName;
-    private String movieThumbnailUrl;
+    private boolean adult;
+    private String backdrop_path;
+    String original_language;
+    String original_title;
+    private String title;
+    private String poster_path;
 
-    public Movie(long id, String movieName, String movieThumbnailUrl) {
+    public Movie(long id, String title, String poster_path) {
         this.id = id;
-        this.movieName = movieName;
-        this.movieThumbnailUrl = movieThumbnailUrl;
+        this.title = title;
+        this.poster_path = poster_path;
     }
 
     public long getId() {
@@ -24,18 +28,18 @@ public class Movie {
     }
 
     public String getMovieName() {
-        return movieName;
+        return title;
     }
 
     public void setMovieName(String movieName) {
-        this.movieName = movieName;
+        this.title = movieName;
     }
 
     public String getMovieThumbnailUrl() {
-        return movieThumbnailUrl;
+        return poster_path;
     }
 
     public void setMovieThumbnailUrl(String movieThumbnailUrl) {
-        this.movieThumbnailUrl = movieThumbnailUrl;
+        this.poster_path = movieThumbnailUrl;
     }
 }
