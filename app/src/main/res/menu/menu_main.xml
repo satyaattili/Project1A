@@ -7,11 +7,6 @@
         android:orderInCategory="100"
         android:title="@string/filter_popular"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_latest"
-        android:orderInCategory="100"
-        android:title="@string/filter_latest"
-        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_toprated"

@@ -11,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -121,7 +123,7 @@ public class MovieDetailViewActivity extends AppCompatActivity {
       mMovieStatusCard.setCardBackgroundColor(getResources().getColor(R.color.md_orange_800));
     }
     double voting = movie.getVote_average();
-    mVoting.setText(String.valueOf(voting)+"/10");
+    mVoting.setText(String.valueOf(voting) + "/10");
     if(voting<=4){
       mMovieVotingCard.setCardBackgroundColor(getResources().getColor(R.color.md_red_800));
     }else if(voting>4 && voting<7.5){
@@ -131,5 +133,20 @@ public class MovieDetailViewActivity extends AppCompatActivity {
     }
 
   }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    int id = item.getItemId();
+    if (id == android.R.id.home) {
+      onBackPressed();
+    }
+    return super.onOptionsItemSelected(item);
+  }
+
 
 }

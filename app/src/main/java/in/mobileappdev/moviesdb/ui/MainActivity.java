@@ -10,7 +10,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -37,6 +40,11 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     private ProgressBar mProgressBar;
     private MovieGridAdapter mMovieAdapter;
     private CallMoviesAPI  mApiService;
+    private String mTitle;
+    private LinearLayout mErrorLayout;
+    private Button mRetryButton;
+    private TextView mErrorMessage;
+    private RecyclerView mMovieRecyclerView;
   @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,9 +53,13 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         setSupportActionBar(toolbar);
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
-        RecyclerView movieList = (RecyclerView) findViewById(R.id.movie_list);
-        movieList.setHasFixedSize(true);
-        movieList.setLayoutManager(new GridLayoutManager(this, 2));
+
+        mErrorLayout = (LinearLayout) findViewById(R.id.error_layout);
+        mErrorMessage = (TextView) findViewById(R.id.error_message);
+        mRetryButton = (Button) findViewById(R.id.btn_retry);
+        mMovieRecyclerView = (RecyclerView) findViewById(R.id.movie_list);
+        mMovieRecyclerView.setHasFixedSize(true);
+        mMovieRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
         mMovieAdapter= new MovieGridAdapter(this, movies);
         mMovieAdapter.setOnMovieClickListener(new MovieGridAdapter.OnMovieClickListener() {
@@ -60,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
           }
         });
 
-        movieList.setAdapter(mMovieAdapter);
+        mMovieRecyclerView.setAdapter(mMovieAdapter);
 
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
@@ -73,7 +85,19 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
         mApiService = retrofit.create(CallMoviesAPI.class);
         mProgressBar.setVisibility(View.VISIBLE);
+
         mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
+        mTitle = getString(R.string.filter_popular);
+        getSupportActionBar().setTitle(mTitle);
+
+      mRetryButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        hideErrorLayout();
+        mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(MainActivity.this);
+      }
+    });
+
 
     }
 
@@ -85,19 +109,17 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-      mProgressBar.setVisibility(View.VISIBLE);
+        hideErrorLayout();
         int id = item.getItemId();
         if (id == R.id.action_popular) {
           mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
-          return true;
-        }else if (id == R.id.action_latest){
-          mApiService.getLatestMovies(Constants.API_KEY).enqueue(this);
-          return true;
+          mTitle = getString(R.string.filter_popular);
+          //return true;   !-- commented because setting title at end after selecting option --!
         }else if(id==R.id.action_toprated){
           mApiService.getTopRatedtMovies(Constants.API_KEY).enqueue(this);
-          return true;
+          mTitle = getString(R.string.filter_toprated);
         }
-
+        getSupportActionBar().setTitle(mTitle);
         return super.onOptionsItemSelected(item);
     }
 
@@ -109,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     if(response.body() != null){
       movies.clear();
       movies.addAll(response.body().getResults());
+      hideErrorLayout();
       mMovieAdapter.notifyDataSetChanged();
     }
     mProgressBar.setVisibility(View.GONE);
@@ -116,7 +139,23 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
   @Override
   public void onFailure(Call<MovieResponse> call, Throwable t) {
-    Log.e(TAG, "onFailure");
-    mProgressBar.setVisibility(View.GONE);
+    movies.clear();
+    mMovieAdapter.notifyDataSetChanged();
+    showErrorLayout();
+    //mErrorMessage.setText("Some thing Wrong, Please try again");
+
   }
+
+  private void showErrorLayout(){
+    mMovieRecyclerView.setVisibility(View.GONE);
+    mProgressBar.setVisibility(View.GONE);
+    mErrorLayout.setVisibility(View.VISIBLE);
+  }
+
+  private void hideErrorLayout(){
+    mMovieRecyclerView.setVisibility(View.VISIBLE);
+    mProgressBar.setVisibility(View.VISIBLE);
+    mErrorLayout.setVisibility(View.GONE);
+  }
+
 }
