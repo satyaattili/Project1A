@@ -9,4 +9,9 @@ public class Constants {
 
     public static String POPULAR_MOVIES = BASE_URL+"movie/popular";
     public static String IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
+
+    public static double GOOD = 7.5;
+    public static double AVERAGE = 5;
+    public static double POOR = 2.5;
+
 }
