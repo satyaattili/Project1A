@@ -40,7 +40,7 @@ public class MovieDetailViewActivity extends AppCompatActivity {
   private ImageView mMoviePoster;
   private ProgressBar mLoading;
   private NestedScrollView mMovieContent;
-  private TextView mOverView, mStatus, mVoting;
+  private TextView mOverView, mStatus, mVoting, mReleaseDate;
   private CardView mMovieStatusCard,mMovieVotingCard;
 
   @Override
@@ -97,6 +97,7 @@ public class MovieDetailViewActivity extends AppCompatActivity {
     mOverView= (TextView) findViewById(R.id.movie_overview);
     mStatus= (TextView) findViewById(R.id.movie_status);
     mVoting= (TextView) findViewById(R.id.movie_voting);
+    mReleaseDate = (TextView)findViewById(R.id.release_date);
     mLoading = (ProgressBar) findViewById(R.id.progressBar);
     mMovieContent = (NestedScrollView) findViewById(R.id.movie_content);
     mMovieStatusCard = (CardView) findViewById(R.id.status_card);
@@ -117,6 +118,8 @@ public class MovieDetailViewActivity extends AppCompatActivity {
 
     mOverView.setText(movie.getOverview());
     mStatus.setText(movie.getStatus());
+    mReleaseDate.setText(getString(R.string.release_date).concat(" : ").concat(movie.getRelease_date
+        ()));
     if(movie.getStatus().toLowerCase().equals("released")){
       mMovieStatusCard.setCardBackgroundColor(getResources().getColor(R.color.md_green_800));
     }else{
@@ -124,11 +127,11 @@ public class MovieDetailViewActivity extends AppCompatActivity {
     }
     double voting = movie.getVote_average();
     mVoting.setText(String.valueOf(voting) + "/10");
-    if(voting<=4){
+    if(voting<=Constants.AVERAGE){
       mMovieVotingCard.setCardBackgroundColor(getResources().getColor(R.color.md_red_800));
-    }else if(voting>4 && voting<7.5){
+    }else if(voting>Constants.AVERAGE && voting<Constants.GOOD){
       mMovieVotingCard.setCardBackgroundColor(getResources().getColor(R.color.md_orange_800));
-    }else if(voting>=7.5){
+    }else if(voting>=Constants.GOOD){
       mMovieVotingCard.setCardBackgroundColor(getResources().getColor(R.color.md_green_800));
     }
 

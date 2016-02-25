@@ -2,6 +2,7 @@ package in.mobileappdev.moviesdb.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     private LinearLayout mErrorLayout;
     private Button mRetryButton;
     private TextView mErrorMessage;
+    private ActionBar mActionBar;
     private RecyclerView mMovieRecyclerView;
   @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        mActionBar = getSupportActionBar();
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
@@ -73,32 +76,37 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         });
 
         mMovieRecyclerView.setAdapter(mMovieAdapter);
-
-        Gson gson = new GsonBuilder()
-                .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-                .create();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-
-        mApiService = retrofit.create(CallMoviesAPI.class);
         mProgressBar.setVisibility(View.VISIBLE);
+
+        createRertrofitApiServce();
 
         mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
         mTitle = getString(R.string.filter_popular);
-        getSupportActionBar().setTitle(mTitle);
+        mActionBar.setTitle(mTitle);
 
-      mRetryButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        hideErrorLayout();
-        mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(MainActivity.this);
-      }
-    });
+        mRetryButton.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          hideErrorLayout();
+          mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(MainActivity.this);
+        }
+      });
+    }
 
+  /**
+   * API SERVICE intialisation with retrofit
+   */
+    private void createRertrofitApiServce(){
+      Gson gson = new GsonBuilder()
+          .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+          .create();
 
+      Retrofit retrofit = new Retrofit.Builder()
+          .baseUrl(Constants.BASE_URL)
+          .addConverterFactory(GsonConverterFactory.create(gson))
+          .build();
+
+      mApiService = retrofit.create(CallMoviesAPI.class);
     }
 
     @Override
@@ -110,16 +118,16 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         hideErrorLayout();
+        clearDataSet();
         int id = item.getItemId();
         if (id == R.id.action_popular) {
           mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
           mTitle = getString(R.string.filter_popular);
-          //return true;   !-- commented because setting title at end after selecting option --!
         }else if(id==R.id.action_toprated){
           mApiService.getTopRatedtMovies(Constants.API_KEY).enqueue(this);
           mTitle = getString(R.string.filter_toprated);
         }
-        getSupportActionBar().setTitle(mTitle);
+        mActionBar.setTitle(mTitle);
         return super.onOptionsItemSelected(item);
     }
 
@@ -139,23 +147,35 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
   @Override
   public void onFailure(Call<MovieResponse> call, Throwable t) {
-    movies.clear();
-    mMovieAdapter.notifyDataSetChanged();
+    clearDataSet();
     showErrorLayout();
-    //mErrorMessage.setText("Some thing Wrong, Please try again");
-
   }
 
+  /**
+   * Showing error layout
+   */
   private void showErrorLayout(){
     mMovieRecyclerView.setVisibility(View.GONE);
     mProgressBar.setVisibility(View.GONE);
     mErrorLayout.setVisibility(View.VISIBLE);
   }
 
+  /**
+   * Hiding error layout
+   */
   private void hideErrorLayout(){
     mMovieRecyclerView.setVisibility(View.VISIBLE);
     mProgressBar.setVisibility(View.VISIBLE);
     mErrorLayout.setVisibility(View.GONE);
+  }
+
+
+  /**
+   * Clearing data set
+   */
+  private void clearDataSet(){
+    movies.clear();
+    mMovieAdapter.notifyDataSetChanged();
   }
 
 }
