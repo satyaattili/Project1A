@@ -135,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
   @Override
   public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
-    Log.e(TAG, "onResponse " + response.body().getResults().size());
     if(response.body() != null){
       movies.clear();
       movies.addAll(response.body().getResults());

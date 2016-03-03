@@ -48,7 +48,7 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
 
         final Result currentMovie = mMovieDataSet.get(position);
         String imageurl = Constants.IMAGE_BASE_URL+currentMovie.getPosterPath();
-        holder.mName.setText(currentMovie.getTitle());
+        //holder.mName.setText(currentMovie.getTitle());
         Picasso.with(mContext).load(imageurl)
             .placeholder(R.drawable.default_movie ).into
             (holder.mThumbnail);
@@ -70,12 +70,12 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
     }
 
     public class MovieViewHolder  extends RecyclerView.ViewHolder{
-        protected TextView mName;
+        //protected TextView mName;
         protected ImageView mThumbnail;
 
         public MovieViewHolder(View v) {
             super(v);
-            mName =  (TextView) v.findViewById(R.id.movie_name);
+           //mName =  (TextView) v.findViewById(R.id.movie_name);
             mThumbnail = (ImageView)  v.findViewById(R.id.movie_thumbnail);
         }
     }
