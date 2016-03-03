@@ -1,15 +1,11 @@
 package in.mobileappdev.moviesdb.services;
 
-import java.util.List;
-
-import in.mobileappdev.moviesdb.models.Movie;
 import in.mobileappdev.moviesdb.models.MovieDetailsResponse;
 import in.mobileappdev.moviesdb.models.MovieResponse;
-import in.mobileappdev.moviesdb.utils.Constants;
+import in.mobileappdev.moviesdb.models.ReviewResponse;
+import in.mobileappdev.moviesdb.models.VideosResponse;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.http.GET;
-import retrofit2.http.Headers;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -28,7 +24,15 @@ public interface CallMoviesAPI {
     Call<MovieResponse> getTopRatedtMovies(@Query("api_key") String apiKey);
 
     @GET("movie/{id}")
-    Call<MovieDetailsResponse> getMovieDetails(@Path("id") int movieId, @Query("api_key") String
+    Call<MovieDetailsResponse> getMovieDetails(@Path("id") long movieId, @Query("api_key") String
+        apiKey);
+
+    @GET("movie/{id}/videos")
+    Call<VideosResponse> getMovieTrailers(@Path("id") long movieId, @Query("api_key") String
+        apiKey);
+
+    @GET("movie/{id}/reviews")
+    Call<ReviewResponse> getMovieReviews(@Path("id") long movieId, @Query("api_key") String
         apiKey);
 
 
