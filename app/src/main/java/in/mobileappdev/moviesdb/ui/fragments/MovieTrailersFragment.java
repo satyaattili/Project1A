@@ -82,8 +82,10 @@ public class MovieTrailersFragment extends Fragment {
           @Override
           public void onResponse(Call<VideosResponse> call,
                                  Response<VideosResponse> response) {
-            Log.e(TAG, "" + response.body().getResults().size());
-            intialisesTrailers(response.body());
+            if(response.body()!=null){
+              intialisesTrailers(response.body());
+            }
+
           }
 
           @Override
