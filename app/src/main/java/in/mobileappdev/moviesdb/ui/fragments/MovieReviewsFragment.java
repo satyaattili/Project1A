@@ -96,8 +96,11 @@ public class MovieReviewsFragment extends Fragment {
   }
 
   private void intialisesReviews(ReviewResponse body) {
-    ReviewListAdapter adapter = new ReviewListAdapter(getActivity(), body.getResults());
-    mRecyclerView.setAdapter(adapter);
+    if(body !=null){
+      ReviewListAdapter adapter = new ReviewListAdapter(getActivity(), body.getResults());
+      mRecyclerView.setAdapter(adapter);
+    }
+
   }
 
   private void initViews(View view) {

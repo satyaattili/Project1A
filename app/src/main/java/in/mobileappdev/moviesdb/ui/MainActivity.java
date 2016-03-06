@@ -28,6 +28,7 @@ import in.mobileappdev.moviesdb.models.MovieResponse;
 import in.mobileappdev.moviesdb.models.Result;
 import in.mobileappdev.moviesdb.services.CallMoviesAPI;
 import in.mobileappdev.moviesdb.utils.Constants;
+import in.mobileappdev.moviesdb.utils.Utils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.GsonConverterFactory;
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         mMovieRecyclerView.setAdapter(mMovieAdapter);
         mProgressBar.setVisibility(View.VISIBLE);
 
-        createRertrofitApiServce();
+        mApiService = Utils.getRertrofitApiServce();
 
         mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
         mTitle = getString(R.string.filter_popular);
@@ -93,21 +94,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
       });
     }
 
-  /**
-   * API SERVICE intialisation with retrofit
-   */
-    private void createRertrofitApiServce(){
-      Gson gson = new GsonBuilder()
-          .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-          .create();
 
-      Retrofit retrofit = new Retrofit.Builder()
-          .baseUrl(Constants.BASE_URL)
-          .addConverterFactory(GsonConverterFactory.create(gson))
-          .build();
-
-      mApiService = retrofit.create(CallMoviesAPI.class);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

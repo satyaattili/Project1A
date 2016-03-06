@@ -66,6 +66,7 @@ public class MovieOverViewFragment extends Fragment {
     super.onCreate(savedInstanceState);
     if (getArguments() != null) {
       mMovieId = getArguments().getLong(ARG_PARAM1);
+      Log.e(TAG, "Movie ID in Overview : "+mMovieId);
     }
   }
 
@@ -89,7 +90,10 @@ public class MovieOverViewFragment extends Fragment {
           @Override
           public void onResponse(Call<MovieDetailsResponse> call,
                                  Response<MovieDetailsResponse> response) {
-            displayMovieDetails(response.body());
+            if(response.body()!=null){
+              displayMovieDetails(response.body());
+            }
+
           }
 
           @Override
@@ -119,7 +123,7 @@ public class MovieOverViewFragment extends Fragment {
 
     String imageurl = Constants.IMAGE_BASE_URL+movie.getBackdrop_path();
     if(getActivity() != null){
-      ((MovieDetailViewActivity) getActivity()).setMovieToolbar(imageurl);
+     // ((MovieDetailViewActivity) getActivity()).setMovieToolbar(imageurl);
     }
 
     mOverView.setText(movie.getOverview());
