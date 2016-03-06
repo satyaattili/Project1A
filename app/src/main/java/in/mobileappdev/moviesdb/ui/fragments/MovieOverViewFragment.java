@@ -122,14 +122,13 @@ public class MovieOverViewFragment extends Fragment {
     mMovieContent.setVisibility(View.VISIBLE);
 
     String imageurl = Constants.IMAGE_BASE_URL+movie.getBackdrop_path();
-    if(getActivity() != null){
-     // ((MovieDetailViewActivity) getActivity()).setMovieToolbar(imageurl);
+    if(getActivity() != null && getActivity() instanceof MovieDetailViewActivity){
+     ((MovieDetailViewActivity) getActivity()).setMovieToolbar(imageurl,movie.getTitle());
     }
 
     mOverView.setText(movie.getOverview());
     mStatus.setText(movie.getStatus());
-    mReleaseDate.setText(getString(R.string.release_date).concat(" : ").concat(movie.getRelease_date
-        ()));
+    mReleaseDate.setText(""+movie.getRelease_date());
     if(movie.getStatus().toLowerCase().equals("released")){
       mMovieStatusCard.setCardBackgroundColor(getResources().getColor(R.color.md_green_800));
     }else{

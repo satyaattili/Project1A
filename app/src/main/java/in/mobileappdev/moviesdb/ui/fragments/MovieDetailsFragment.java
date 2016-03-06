@@ -25,7 +25,6 @@ public class MovieDetailsFragment extends Fragment {
   private static final String ARG_PARAM2 = "mname";
   private ViewPager viewPager;
   private TabLayout tabLayout;
-  private int movieId = 76341;
   private ViewPagerAdapter adapter;
 
   private long mMovieId;
@@ -66,7 +65,7 @@ public class MovieDetailsFragment extends Fragment {
     viewPager = (ViewPager) view.findViewById(R.id.viewpager);
     viewPager.setOffscreenPageLimit(3);
 
-    setupViewPager(viewPager,movieId);
+    setupViewPager(viewPager,mMovieId);
 
     tabLayout = (TabLayout) view.findViewById(R.id.tabs);
     tabLayout.setupWithViewPager(viewPager);

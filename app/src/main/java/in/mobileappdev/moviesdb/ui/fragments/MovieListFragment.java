@@ -87,11 +87,7 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
     mMovieAdapter.setOnMovieClickListener(new MovieGridAdapter.OnMovieClickListener() {
       @Override
       public void onMovieClick(String movieName, int movieId) {
-        /*Intent detailsActivity = new Intent(getActivity(), MovieDetailViewActivity.class);
-        detailsActivity.putExtra("movie_id", movieId);
-        detailsActivity.putExtra("movie_name", movieName);
-        startActivity(detailsActivity);*/
-        mOnMovieSelectedListener.onMovieSelected(movieId);
+        mOnMovieSelectedListener.onMovieSelected(movieId, movieName);
       }
     });
 
@@ -118,6 +114,7 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
     if(response.body() != null){
       movies.clear();
       movies.addAll(response.body().getResults());
+      //`mOnMovieSelectedListener.onMovieSelected(movies.get(0).getId(), movies.get(0).getTitle());
       hideErrorLayout();
       mMovieAdapter.notifyDataSetChanged();
     }
@@ -181,7 +178,7 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
   }
 
   public interface OnMovieSelectedListener {
-    public void onMovieSelected(long position);
+    public void onMovieSelected(long mId ,String mName);
   }
 
   @Override
@@ -202,7 +199,6 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
-    super.onConfigurationChanged(newConfig);
     if(newConfig.getLayoutDirection() == Configuration.ORIENTATION_LANDSCAPE){
       mMovieRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
     }else{
