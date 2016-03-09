@@ -15,12 +15,16 @@ import in.mobileappdev.moviesdb.ui.fragments.MovieListFragment;
 public class DashboardActivity extends AppCompatActivity implements
     MovieListFragment.OnMovieSelectedListener{
 
-  MovieDetailsFragment articleFrag;
+  private MovieDetailsFragment articleFrag;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_dashboard);
+
+    //binding = DataBindingUtil.setContentView(this, R.layout.activity_dashboard);
+    //binding.toolbar.setTitle("");
+
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 

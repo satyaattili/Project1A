@@ -26,6 +26,7 @@ import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.adapters.MovieGridAdapter;
 import in.mobileappdev.moviesdb.models.MovieResponse;
 import in.mobileappdev.moviesdb.models.Result;
+import in.mobileappdev.moviesdb.rest.MovieDBApiHelper;
 import in.mobileappdev.moviesdb.services.CallMoviesAPI;
 import in.mobileappdev.moviesdb.utils.Constants;
 import in.mobileappdev.moviesdb.utils.Utils;
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         mMovieRecyclerView.setAdapter(mMovieAdapter);
         mProgressBar.setVisibility(View.VISIBLE);
 
-        mApiService = Utils.getRertrofitApiServce();
+        mApiService = MovieDBApiHelper.getApiService();
 
         mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
         mTitle = getString(R.string.filter_popular);

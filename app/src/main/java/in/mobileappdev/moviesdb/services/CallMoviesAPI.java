@@ -35,5 +35,9 @@ public interface CallMoviesAPI {
     Call<ReviewResponse> getMovieReviews(@Path("id") long movieId, @Query("api_key") String
         apiKey);
 
+    @GET("movie/{id}/reviews")
+    Call<ReviewResponse> getRequestToken(@Path("id") long movieId, @Query("api_key") String
+        apiKey);
+
 
 }

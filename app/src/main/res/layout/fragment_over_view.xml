@@ -21,10 +21,136 @@
         android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:layout_weight="1">
+                    <android.support.v7.widget.CardView
+                        android:layout_gravity="center"
+                        android:layout_width="match_parent"
+                        app:cardBackgroundColor="@color/md_orange_800"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        card_view:cardCornerRadius="2dp"
+                        card_view:contentPadding="10dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/lb1"
+                            android:textSize="18sp"
+                            android:text="Sample"
+                            android:gravity="center"
+                            android:textAllCaps="true"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/white"
+                            android:layout_gravity="center"
+                            android:padding="4dp"/>
+                    </android.support.v7.widget.CardView>
+                    <android.support.v7.widget.CardView
+                        android:layout_gravity="center"
+                        android:layout_width="match_parent"
+                        app:cardBackgroundColor="@color/md_orange_800"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        card_view:cardCornerRadius="2dp"
+                        card_view:contentPadding="10dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/lb2"
+                            android:text="Sample"
+                            android:textSize="18sp"
+                            android:gravity="center"
+                            android:textAllCaps="true"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/white"
+                            android:layout_gravity="center"
+                            android:padding="4dp"/>
+                    </android.support.v7.widget.CardView>
+                </LinearLayout>
+
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:orientation="vertical"
+                    android:layout_weight="1">
+                    <in.mobileappdev.moviesdb.views.CircleImageView
+                        xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/movie_thumbnail"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@mipmap/ic_launcher"
+                        app:civ_border_color="#FF000000"/>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:layout_weight="1">
+                    <android.support.v7.widget.CardView
+                        android:layout_gravity="center"
+                        android:layout_width="match_parent"
+                        app:cardBackgroundColor="@color/md_orange_800"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        card_view:cardCornerRadius="2dp"
+                        card_view:contentPadding="10dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/rb1"
+                            android:textSize="18sp"
+                            android:text="Sample"
+                            android:gravity="center"
+                            android:textAllCaps="true"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/white"
+                            android:layout_gravity="center"
+                            android:padding="4dp"/>
+                    </android.support.v7.widget.CardView>
+                    <android.support.v7.widget.CardView
+                        android:layout_gravity="center"
+                        android:layout_width="match_parent"
+                        app:cardBackgroundColor="@color/md_orange_800"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        card_view:cardCornerRadius="2dp"
+                        card_view:contentPadding="10dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/rb2"
+                            android:text="Sample"
+                            android:textSize="18sp"
+                            android:gravity="center"
+                            android:textAllCaps="true"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/white"
+                            android:layout_gravity="center"
+                            android:padding="4dp"/>
+                    </android.support.v7.widget.CardView>
+                </LinearLayout>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -45,6 +171,7 @@
                         android:id="@+id/movie_status"
                         android:textSize="18sp"
                         android:gravity="center"
+                        android:text="Sample"
                         android:textAllCaps="true"
                         android:textStyle="bold"
                         android:textColor="@android:color/white"
@@ -67,6 +194,7 @@
                         android:id="@+id/movie_voting"
                         android:textSize="18sp"
                         android:gravity="center"
+                        android:text="Sample"
                         android:textStyle="bold"
                         android:textColor="@android:color/white"
                         android:layout_gravity="center"

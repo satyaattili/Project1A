@@ -27,6 +27,7 @@ import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.adapters.MovieGridAdapter;
 import in.mobileappdev.moviesdb.models.MovieResponse;
 import in.mobileappdev.moviesdb.models.Result;
+import in.mobileappdev.moviesdb.rest.MovieDBApiHelper;
 import in.mobileappdev.moviesdb.services.CallMoviesAPI;
 import in.mobileappdev.moviesdb.ui.MovieDetailViewActivity;
 import in.mobileappdev.moviesdb.utils.Constants;
@@ -62,7 +63,7 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setHasOptionsMenu(true);
-    mApiService = Utils.getRertrofitApiServce();
+    mApiService = MovieDBApiHelper.getApiService();
   }
 
   @Override
@@ -94,7 +95,7 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
     mMovieRecyclerView.setAdapter(mMovieAdapter);
     mProgressBar.setVisibility(View.VISIBLE);
 
-    mApiService = Utils.getRertrofitApiServce();
+    mApiService = MovieDBApiHelper.getApiService();
 
     mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
     mTitle = getString(R.string.filter_popular);
@@ -196,13 +197,5 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
   }
 
 
-  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-  @Override
-  public void onConfigurationChanged(Configuration newConfig) {
-    if(newConfig.getLayoutDirection() == Configuration.ORIENTATION_LANDSCAPE){
-      mMovieRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
-    }else{
-      mMovieRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 1));
-    }
-  }
+
 }

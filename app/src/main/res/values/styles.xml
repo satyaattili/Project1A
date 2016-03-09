@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:actionOverflowButtonStyle">@style/MyActionButtonOverflow</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -19,12 +20,19 @@
 
     <style name="MovieTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabTextAppearance">@style/MovieTabText</item>
-        <item name="tabSelectedTextColor">@color/md_red_800</item>
+        <item name="tabSelectedTextColor">@android:color/black</item>
     </style>
 
     <style name="MovieTabText" parent="TextAppearance.AppCompat.Button">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <!-- Style to replace actionbar overflow icon. set item 'android:actionOverflowButtonStyle' in AppTheme -->
+    <style name="MyActionButtonOverflow" parent="android:style/Widget.Holo.Light.ActionButton.Overflow">
+        <item name="android:src">@drawable/ic_action_content_sort</item>
+        <item name="android:background">?android:attr/actionBarItemBackground</item>
+        <item name="android:contentDescription">"Sort"</item>
     </style>
 
 </resources>

@@ -4,6 +4,7 @@ package in.mobileappdev.moviesdb.ui.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import com.google.android.youtube.player.YouTubeIntents;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.squareup.otto.Subscribe;
 
 import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.adapters.ReviewListAdapter;
@@ -21,7 +23,9 @@ import in.mobileappdev.moviesdb.adapters.TrailerListAdapter;
 import in.mobileappdev.moviesdb.models.ReviewResponse;
 import in.mobileappdev.moviesdb.models.ReviewResult;
 import in.mobileappdev.moviesdb.models.VideosResponse;
+import in.mobileappdev.moviesdb.rest.MovieDBApiHelper;
 import in.mobileappdev.moviesdb.services.CallMoviesAPI;
+import in.mobileappdev.moviesdb.utils.BusProvider;
 import in.mobileappdev.moviesdb.utils.Constants;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,6 +41,7 @@ public class MovieReviewsFragment extends Fragment {
   private long mMovieId;
   private CallMoviesAPI service;
   private RecyclerView mRecyclerView;
+  private ContentLoadingProgressBar mProgressBar;
 
 
   public MovieReviewsFragment() {
@@ -54,9 +59,16 @@ public class MovieReviewsFragment extends Fragment {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    BusProvider.getInstance().register(this);
     if (getArguments() != null) {
       mMovieId = getArguments().getLong(ARG_PARAM1);
     }
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    BusProvider.getInstance().unregister(this);
   }
 
   @Override
@@ -64,28 +76,18 @@ public class MovieReviewsFragment extends Fragment {
                            Bundle savedInstanceState) {
     View view =  inflater.inflate(R.layout.fragment_movie_trailers, container, false);
     initViews(view);
-    getVideos();
     return view;
   }
 
   private void getVideos() {
-    Gson gson = new GsonBuilder()
-        .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-        .create();
-
-    Retrofit retrofit = new Retrofit.Builder()
-        .baseUrl(Constants.BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .build();
-
-    service = retrofit.create(CallMoviesAPI.class);
+    service =  MovieDBApiHelper.getApiService();
     service.getMovieReviews(mMovieId, Constants.API_KEY).enqueue(
         new Callback<ReviewResponse>() {
           @Override
           public void onResponse(Call<ReviewResponse> call,
                                  Response<ReviewResponse> response) {
             //Log.e(TAG, "" + response.body().getResults().size());
-            intialisesReviews(response.body());
+
           }
 
           @Override
@@ -99,14 +101,25 @@ public class MovieReviewsFragment extends Fragment {
     if(body !=null){
       ReviewListAdapter adapter = new ReviewListAdapter(getActivity(), body.getResults());
       mRecyclerView.setAdapter(adapter);
+      mProgressBar.setVisibility(View.GONE);
     }
 
   }
 
+  @Subscribe
+  public void reviewResponse(ReviewResponse response){
+    Log.e(TAG, "Subscripe review response : "+response);
+    intialisesReviews(response);
+  }
+
+
   private void initViews(View view) {
-// Initialize recycler view
+    // Initialize recycler view
     mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+    mProgressBar = (ContentLoadingProgressBar) view.findViewById(R.id.progress_bar);
+    mProgressBar.setVisibility(View.VISIBLE);
     mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
   }
 
 }

@@ -13,19 +13,23 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.squareup.otto.Subscribe;
+import com.squareup.picasso.Picasso;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.models.MovieDetailsResponse;
+import in.mobileappdev.moviesdb.rest.MovieDBApiHelper;
 import in.mobileappdev.moviesdb.services.CallMoviesAPI;
 import in.mobileappdev.moviesdb.ui.MovieDetailViewActivity;
+import in.mobileappdev.moviesdb.utils.BusProvider;
 import in.mobileappdev.moviesdb.utils.Constants;
+import in.mobileappdev.moviesdb.utils.Utils;
+import in.mobileappdev.moviesdb.views.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.GsonConverterFactory;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 
 public class MovieOverViewFragment extends Fragment {
@@ -36,23 +40,22 @@ public class MovieOverViewFragment extends Fragment {
   private CallMoviesAPI service;
   private CollapsingToolbarLayout collapsingToolbar;
   private ImageView mMoviePoster;
+  private CircleImageView mThumbnailImage;
   private ProgressBar mLoading;
   private NestedScrollView mMovieContent;
   private TextView mOverView, mStatus, mVoting, mReleaseDate;
   private CardView mMovieStatusCard,mMovieVotingCard;
 
+  @Bind(R.id.lb1) TextView leftButton1;
+  @Bind(R.id.lb2) TextView leftButton2;
+  @Bind(R.id.rb1) TextView rightButton1;
+  @Bind(R.id.rb2) TextView rightButton2;
+
+
   public MovieOverViewFragment() {
     // Required empty public constructor
   }
 
-  /**
-   * Use this factory method to create a new instance of
-   * this fragment using the provided parameters.
-   *
-   * @param param1 Parameter 1.
-   * @return A new instance of fragment MovieOverViewFragment.
-   */
-  // TODO: Rename and change types and number of parameters
   public static MovieOverViewFragment newInstance(long param1) {
     MovieOverViewFragment fragment = new MovieOverViewFragment();
     Bundle args = new Bundle();
@@ -64,6 +67,7 @@ public class MovieOverViewFragment extends Fragment {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    BusProvider.getInstance().register(this);
     if (getArguments() != null) {
       mMovieId = getArguments().getLong(ARG_PARAM1);
       Log.e(TAG, "Movie ID in Overview : "+mMovieId);
@@ -71,39 +75,25 @@ public class MovieOverViewFragment extends Fragment {
   }
 
   @Override
+  public void onPause() {
+    super.onPause();
+    BusProvider.getInstance().unregister(this);
+  }
+
+  @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
     View view =  inflater.inflate(R.layout.fragment_over_view, container, false);
+    ButterKnife.bind(this, view);
     initViews(view);
-    Gson gson = new GsonBuilder()
-        .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-        .create();
-
-    Retrofit retrofit = new Retrofit.Builder()
-        .baseUrl(Constants.BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .build();
-
-    service = retrofit.create(CallMoviesAPI.class);
-    service.getMovieDetails(mMovieId, Constants.API_KEY).enqueue(
-        new Callback<MovieDetailsResponse>() {
-          @Override
-          public void onResponse(Call<MovieDetailsResponse> call,
-                                 Response<MovieDetailsResponse> response) {
-            if(response.body()!=null){
-              displayMovieDetails(response.body());
-            }
-
-          }
-
-          @Override
-          public void onFailure(Call<MovieDetailsResponse> call, Throwable t) {
-            Log.e(TAG, "OnFailure");
-          }
-        });
     return view;
   }
 
+
+  /**
+   * Intialise views
+   * @param view
+   */
   private void initViews(View view) {
 
     mOverView= (TextView) view.findViewById(R.id.movie_overview);
@@ -114,14 +104,36 @@ public class MovieOverViewFragment extends Fragment {
     mMovieContent = (NestedScrollView) view.findViewById(R.id.movie_content);
     mMovieStatusCard = (CardView) view.findViewById(R.id.status_card);
     mMovieVotingCard = (CardView) view.findViewById(R.id.voting_card);
+    mThumbnailImage = (CircleImageView) view.findViewById(R.id.movie_thumbnail);
   }
 
+
+  @Subscribe
+  public void getOverViewResponse(MovieDetailsResponse movieDetails){
+    displayMovieDetails(movieDetails);
+  }
+
+
+  /**
+   * Display Movie Overview
+   * @param movie
+   */
   private void displayMovieDetails(MovieDetailsResponse movie){
 
     mLoading.setVisibility(View.GONE);
     mMovieContent.setVisibility(View.VISIBLE);
 
+    leftButton1.setText(String.valueOf(movie.getPopularity()));
+    leftButton2.setText(String.valueOf(movie.getRevenue()));
+
+    rightButton1.setText(String.valueOf(movie.getVote_average()));
+    rightButton2.setText(String.valueOf(movie.getRuntime()));
+
     String imageurl = Constants.IMAGE_BASE_URL+movie.getBackdrop_path();
+    String posterUrl = Constants.IMAGE_BASE_URL+movie.getPoster_path();
+    Picasso.with(getActivity()).load(posterUrl)
+        .placeholder(R.drawable.default_movie).error(R.drawable.default_movie)
+        .into(mThumbnailImage);
     if(getActivity() != null && getActivity() instanceof MovieDetailViewActivity){
      ((MovieDetailViewActivity) getActivity()).setMovieToolbar(imageurl,movie.getTitle());
     }

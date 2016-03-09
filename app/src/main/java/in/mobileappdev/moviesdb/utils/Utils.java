@@ -33,21 +33,6 @@ public class Utils {
     return hasConnectedWifi || hasConnectedMobile;
   }
 
-  /**
-   * API SERVICE intialisation with retrofit
-   */
-  public static CallMoviesAPI getRertrofitApiServce(){
-    Gson gson = new GsonBuilder()
-        .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-        .create();
 
-    Retrofit retrofit = new Retrofit.Builder()
-        .baseUrl(Constants.BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .build();
-
-    return  retrofit.create(CallMoviesAPI.class);
-
-  }
 
 }
