@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:card_view="http://schemas.android.com/tools"
-    tools:context="in.mobileappdev.moviesdb.ui.fragments.OverViewFragment">
+    tools:context="in.mobileappdev.moviesdb.ui.fragments.MovieOverViewFragment">
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -20,8 +20,6 @@
         android:id="@+id/movie_content"
         android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -114,18 +112,33 @@
                         android:layout_margin="5dp"
                         card_view:cardCornerRadius="2dp"
                         card_view:contentPadding="10dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/rb1"
-                            android:textSize="18sp"
-                            android:text="Sample"
-                            android:gravity="center"
-                            android:textAllCaps="true"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/white"
-                            android:layout_gravity="center"
-                            android:padding="4dp"/>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:padding="2dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Vote Average"
+                                android:textSize="12sp"
+                                android:textStyle="italic"
+                                android:textColor="@android:color/white"
+                                android:layout_gravity="center"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/rb1"
+                                android:text="Sample"
+                                android:textSize="14sp"
+                                android:gravity="center"
+                                android:textAllCaps="true"
+                                android:textStyle="bold"
+                                android:textColor="@android:color/white"
+                                android:layout_gravity="center"
+                                android:paddingBottom="4dp"/>
+                        </LinearLayout>
+
                     </android.support.v7.widget.CardView>
                     <android.support.v7.widget.CardView
                         android:layout_gravity="center"
@@ -135,18 +148,32 @@
                         android:layout_margin="5dp"
                         card_view:cardCornerRadius="2dp"
                         card_view:contentPadding="10dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/rb2"
-                            android:text="Sample"
-                            android:textSize="18sp"
-                            android:gravity="center"
-                            android:textAllCaps="true"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/white"
-                            android:layout_gravity="center"
-                            android:padding="4dp"/>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:padding="2dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Runtime"
+                                android:textSize="12sp"
+                                android:textStyle="italic"
+                                android:textColor="@android:color/white"
+                                android:layout_gravity="center"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/rb2"
+                                android:text="Sample"
+                                android:textSize="14sp"
+                                android:gravity="center"
+                                android:textAllCaps="true"
+                                android:textStyle="bold"
+                                android:textColor="@android:color/white"
+                                android:layout_gravity="center"
+                                android:paddingBottom="4dp"/>
+                        </LinearLayout>
                     </android.support.v7.widget.CardView>
                 </LinearLayout>
 

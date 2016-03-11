@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
 
         mApiService = MovieDBApiHelper.getApiService();
 
-        mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
+        mApiService.getPopularLatestMovies(1,Constants.API_KEY).enqueue(this);
         mTitle = getString(R.string.filter_popular);
         mActionBar.setTitle(mTitle);
 
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         @Override
         public void onClick(View v) {
           hideErrorLayout();
-          mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(MainActivity.this);
+          mApiService.getPopularLatestMovies(1,Constants.API_KEY).enqueue(MainActivity.this);
         }
       });
     }
@@ -109,10 +109,10 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         clearDataSet();
         int id = item.getItemId();
         if (id == R.id.action_popular) {
-          mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
+          mApiService.getPopularLatestMovies(1,Constants.API_KEY).enqueue(this);
           mTitle = getString(R.string.filter_popular);
         }else if(id==R.id.action_toprated){
-          mApiService.getTopRatedtMovies(Constants.API_KEY).enqueue(this);
+          mApiService.getTopRatedtMovies(1,Constants.API_KEY).enqueue(this);
           mTitle = getString(R.string.filter_toprated);
         }
         mActionBar.setTitle(mTitle);

@@ -19,6 +19,7 @@ import com.squareup.picasso.Picasso;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import in.mobileappdev.moviesdb.R;
+import in.mobileappdev.moviesdb.models.Credits;
 import in.mobileappdev.moviesdb.models.MovieDetailsResponse;
 import in.mobileappdev.moviesdb.rest.MovieDBApiHelper;
 import in.mobileappdev.moviesdb.services.CallMoviesAPI;
@@ -70,13 +71,13 @@ public class MovieOverViewFragment extends Fragment {
     BusProvider.getInstance().register(this);
     if (getArguments() != null) {
       mMovieId = getArguments().getLong(ARG_PARAM1);
-      Log.e(TAG, "Movie ID in Overview : "+mMovieId);
     }
   }
 
+
   @Override
-  public void onPause() {
-    super.onPause();
+  public void onStop() {
+    super.onStop();
     BusProvider.getInstance().unregister(this);
   }
 

@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.otto.Bus;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 
 import in.mobileappdev.moviesdb.R;
+import in.mobileappdev.moviesdb.models.Credits;
 import in.mobileappdev.moviesdb.models.MovieDetailsResponse;
 import in.mobileappdev.moviesdb.models.ReviewResponse;
 import in.mobileappdev.moviesdb.models.VideosResponse;
@@ -43,6 +45,7 @@ public class MovieDetailsFragment extends Fragment {
   private ViewPagerAdapter adapter;
   private long mMovieId;
   private String mMovieName;
+  private ProgressBar mProgressLoading;
 
   public static MovieDetailsFragment newInstance(long mid, String mname) {
     MovieDetailsFragment fragment = new MovieDetailsFragment();
@@ -76,6 +79,7 @@ public class MovieDetailsFragment extends Fragment {
   }
 
   private void initViews(View view) {
+    mProgressLoading = (ProgressBar) view.findViewById(R.id.overview_loading) ;
     viewPager = (ViewPager) view.findViewById(R.id.viewpager);
     viewPager.setOffscreenPageLimit(3);
 
@@ -199,16 +203,34 @@ public class MovieDetailsFragment extends Fragment {
       if(response.isSuccess() && response.body()!=null){
         adapter.addFragment(MovieOverViewFragment.newInstance(mMovieId), "Overview");
         adapter.notifyDataSetChanged();
+        MovieDBApiHelper.getApiService().getCredits(mMovieId,Constants.API_KEY).enqueue(creditsCallback);
         MovieDBApiHelper.getApiService().getMovieTrailers(mMovieId, Constants.API_KEY).enqueue(
             trailerResponseCallback);
         MovieDBApiHelper.getApiService().getMovieReviews(mMovieId, Constants.API_KEY).enqueue
             (reviewResponseCallback);
         BusProvider.getInstance().post(response.body());
+        mProgressLoading.setVisibility(View.GONE);
       }
     }
 
     @Override
     public void onFailure(Call<MovieDetailsResponse> call, Throwable t) {
+
+    }
+  };
+
+  Callback<Credits> creditsCallback = new Callback<Credits>() {
+    @Override
+    public void onResponse(Call<Credits> call, Response<Credits> response) {
+      if(response.isSuccess() && response.body()!=null && response.body().getCast().size()>0){
+        adapter.addFragment(MovieCastAndCrewFragment.newInstance(mMovieId), "CAST");
+        adapter.notifyDataSetChanged();
+        BusProvider.getInstance().post(response.body());
+      }
+    }
+
+    @Override
+    public void onFailure(Call<Credits> call, Throwable t) {
 
     }
   };

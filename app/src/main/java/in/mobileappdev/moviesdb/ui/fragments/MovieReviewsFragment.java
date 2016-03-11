@@ -66,8 +66,8 @@ public class MovieReviewsFragment extends Fragment {
   }
 
   @Override
-  public void onPause() {
-    super.onPause();
+  public void onStop() {
+    super.onStop();
     BusProvider.getInstance().unregister(this);
   }
 

@@ -12,6 +12,8 @@ public class Constants {
 
     public static String YOUTUBE_VIDEO_API_KEY = "AIzaSyD1cHQhUrl3VGAWN2CZCjmkXYlfLiGD6ts";
 
+    public static String SORT_BY = "sort_by";
+
     public static double GOOD = 7.5;
     public static double AVERAGE = 5;
     public static double POOR = 2.5;
