@@ -2,6 +2,7 @@ package in.mobileappdev.moviesdb.services;
 
 import in.mobileappdev.moviesdb.models.Credits;
 import in.mobileappdev.moviesdb.models.MovieDetailsResponse;
+import in.mobileappdev.moviesdb.models.MovieImages;
 import in.mobileappdev.moviesdb.models.MovieResponse;
 import in.mobileappdev.moviesdb.models.ReviewResponse;
 import in.mobileappdev.moviesdb.models.VideosResponse;
@@ -45,6 +46,11 @@ public interface CallMoviesAPI {
     @GET("movie/{id}/credits")
     Call<Credits> getCredits(@Path("id") long movieId, @Query("api_key") String
         apiKey);
+
+    @GET("movie/{id}/images")
+    Call<MovieImages> getMovieImages(@Path("id") long movieId, @Query("api_key") String
+        apiKey);
+
 
 
 }
