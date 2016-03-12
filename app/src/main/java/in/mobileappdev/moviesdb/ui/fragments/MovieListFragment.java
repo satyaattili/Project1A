@@ -3,6 +3,7 @@ package in.mobileappdev.moviesdb.ui.fragments;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -85,6 +86,13 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
     mMovieRecyclerView.setHasFixedSize(true);
     final GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(),2);
     mMovieRecyclerView.setLayoutManager(gridLayoutManager);
+
+    RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
+    itemAnimator.setAddDuration(3000);
+    itemAnimator.setRemoveDuration(3000);
+    itemAnimator.setChangeDuration(3000);
+    itemAnimator.setMoveDuration(3000);
+    mMovieRecyclerView.setItemAnimator(itemAnimator);
 
     mMovieRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
       @Override
