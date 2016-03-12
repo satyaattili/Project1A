@@ -1,6 +1,7 @@
 package in.mobileappdev.moviesdb.ui.fragments;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,15 +10,31 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.squareup.otto.Bus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import in.mobileappdev.moviesdb.R;
+import in.mobileappdev.moviesdb.models.Credits;
+import in.mobileappdev.moviesdb.models.MovieDetailsResponse;
+import in.mobileappdev.moviesdb.models.ReviewResponse;
+import in.mobileappdev.moviesdb.models.VideosResponse;
+import in.mobileappdev.moviesdb.rest.MovieDBApiHelper;
+import in.mobileappdev.moviesdb.utils.BusProvider;
+import in.mobileappdev.moviesdb.utils.Constants;
+import in.mobileappdev.moviesdb.utils.Utils;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MovieDetailsFragment extends Fragment {
 
@@ -26,9 +43,9 @@ public class MovieDetailsFragment extends Fragment {
   private ViewPager viewPager;
   private TabLayout tabLayout;
   private ViewPagerAdapter adapter;
-
   private long mMovieId;
   private String mMovieName;
+  private ProgressBar mProgressLoading;
 
   public static MovieDetailsFragment newInstance(long mid, String mname) {
     MovieDetailsFragment fragment = new MovieDetailsFragment();
@@ -46,6 +63,7 @@ public class MovieDetailsFragment extends Fragment {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    setHasOptionsMenu(true);
     if (getArguments() != null) {
       mMovieId = getArguments().getLong(ARG_PARAM1);
       mMovieName = getArguments().getString(ARG_PARAM2);
@@ -55,24 +73,26 @@ public class MovieDetailsFragment extends Fragment {
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
-    // Inflate the layout for this fragment
     View view =  inflater.inflate(R.layout.fragment_movie_details, container, false);
     initViews(view);
     return view;
   }
 
   private void initViews(View view) {
+    mProgressLoading = (ProgressBar) view.findViewById(R.id.overview_loading) ;
     viewPager = (ViewPager) view.findViewById(R.id.viewpager);
     viewPager.setOffscreenPageLimit(3);
 
-    setupViewPager(viewPager,mMovieId);
+    setupViewPager(viewPager, mMovieId);
 
     tabLayout = (TabLayout) view.findViewById(R.id.tabs);
     tabLayout.setupWithViewPager(viewPager);
+
   }
 
   public void updateArticleView(long position) {
       mMovieId = position;
+      MovieDBApiHelper.getApiService().getMovieReviews(mMovieId, Constants.API_KEY);
       setupViewPager(viewPager, position);
     if(adapter != null){
       adapter.notifyDataSetChanged();
@@ -80,10 +100,8 @@ public class MovieDetailsFragment extends Fragment {
   }
 
   private void setupViewPager(ViewPager viewPager, long mid) {
+    MovieDBApiHelper.getApiService().getMovieDetails(mid, Constants.API_KEY).enqueue(overViewResponseCallback);
     adapter = new ViewPagerAdapter(getChildFragmentManager());
-    adapter.addFragment(MovieOverViewFragment.newInstance(mid), "Overview");
-    adapter.addFragment(MovieTrailersFragment.newInstance(mid), "Trailers");
-    adapter.addFragment(MovieReviewsFragment.newInstance(mid), "Reviews");
     viewPager.setAdapter(adapter);
   }
 
@@ -116,19 +134,106 @@ public class MovieDetailsFragment extends Fragment {
     }
   }
 
- /* @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    return true;
+
+  @Override
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    getActivity().getMenuInflater().inflate(R.menu.menu_movie_details, menu);
+    MenuItem item = menu.findItem(R.id.action_favorite);
+    super.onCreateOptionsMenu(menu, inflater);
   }
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
+
     int id = item.getItemId();
-    if (id == android.R.id.home) {
-      onBackPressed();
+    if (id == R.id.action_favorite) {
+      //TO-DO API CALL to Fav
+      if(item.isChecked()){
+        item.setChecked(false);
+        item.setIcon(R.drawable.ic_action_favorite_outline);
+        Snackbar.make(getView(), "Deleted from Favourites", Snackbar.LENGTH_SHORT);
+      }else{
+        item.setChecked(true);
+        item.setIcon(R.drawable.ic_action_favorite);
+        Snackbar.make(getView(), "Added to your Favourites", Snackbar.LENGTH_SHORT);
+      }
+    }else if(id==R.id.home){
+      getActivity().onBackPressed();
     }
     return super.onOptionsItemSelected(item);
-  }*/
+  }
+
+
+  Callback<ReviewResponse> reviewResponseCallback = new Callback<ReviewResponse>() {
+    @Override
+    public void onResponse(Call<ReviewResponse> call, Response<ReviewResponse> response) {
+      if(response.isSuccess() && response.body()!=null && response.body().getResults().size()>0){
+        adapter.addFragment(MovieReviewsFragment.newInstance(mMovieId), "Reviews");
+        adapter.notifyDataSetChanged();
+        BusProvider.getInstance().post(response.body());
+      }
+    }
+
+    @Override
+    public void onFailure(Call<ReviewResponse> call, Throwable t) {
+
+    }
+  };
+
+  Callback<VideosResponse> trailerResponseCallback = new Callback<VideosResponse>() {
+    @Override
+    public void onResponse(Call<VideosResponse> call, Response<VideosResponse> response) {
+      if(response.isSuccess() && response.body()!=null && response.body().getResults().size()>0){
+        adapter.addFragment(MovieTrailersFragment.newInstance(mMovieId), "Trailers");
+        adapter.notifyDataSetChanged();
+        BusProvider.getInstance().post(response.body());
+      }
+    }
+
+    @Override
+    public void onFailure(Call<VideosResponse> call, Throwable t) {
+
+    }
+  };
+
+
+  Callback<MovieDetailsResponse> overViewResponseCallback = new Callback<MovieDetailsResponse>() {
+    @Override
+    public void onResponse(Call<MovieDetailsResponse> call, Response<MovieDetailsResponse> response) {
+      if(response.isSuccess() && response.body()!=null){
+        adapter.addFragment(MovieOverViewFragment.newInstance(mMovieId), "Overview");
+        adapter.notifyDataSetChanged();
+        MovieDBApiHelper.getApiService().getCredits(mMovieId,Constants.API_KEY).enqueue(creditsCallback);
+        MovieDBApiHelper.getApiService().getMovieTrailers(mMovieId, Constants.API_KEY).enqueue(
+            trailerResponseCallback);
+        MovieDBApiHelper.getApiService().getMovieReviews(mMovieId, Constants.API_KEY).enqueue
+            (reviewResponseCallback);
+        BusProvider.getInstance().post(response.body());
+        mProgressLoading.setVisibility(View.GONE);
+      }
+    }
+
+    @Override
+    public void onFailure(Call<MovieDetailsResponse> call, Throwable t) {
+
+    }
+  };
+
+  Callback<Credits> creditsCallback = new Callback<Credits>() {
+    @Override
+    public void onResponse(Call<Credits> call, Response<Credits> response) {
+      if(response.isSuccess() && response.body()!=null && response.body().getCast().size()>0){
+        adapter.addFragment(MovieCastAndCrewFragment.newInstance(mMovieId), "CAST");
+        adapter.notifyDataSetChanged();
+        BusProvider.getInstance().post(response.body());
+      }
+    }
+
+    @Override
+    public void onFailure(Call<Credits> call, Throwable t) {
+
+    }
+  };
 
 
 }

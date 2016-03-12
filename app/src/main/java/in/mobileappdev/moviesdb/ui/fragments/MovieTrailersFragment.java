@@ -14,12 +14,15 @@ import android.view.ViewGroup;
 import com.google.android.youtube.player.YouTubeIntents;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.squareup.otto.Subscribe;
 
 import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.adapters.TrailerListAdapter;
 import in.mobileappdev.moviesdb.models.MovieDetailsResponse;
 import in.mobileappdev.moviesdb.models.VideosResponse;
+import in.mobileappdev.moviesdb.rest.MovieDBApiHelper;
 import in.mobileappdev.moviesdb.services.CallMoviesAPI;
+import in.mobileappdev.moviesdb.utils.BusProvider;
 import in.mobileappdev.moviesdb.utils.Constants;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -52,9 +55,16 @@ public class MovieTrailersFragment extends Fragment {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    BusProvider.getInstance().register(this);
     if (getArguments() != null) {
       mMovieId = getArguments().getLong(ARG_PARAM1);
     }
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    BusProvider.getInstance().unregister(this);
   }
 
   @Override
@@ -62,28 +72,18 @@ public class MovieTrailersFragment extends Fragment {
                            Bundle savedInstanceState) {
     View view =  inflater.inflate(R.layout.fragment_movie_trailers, container, false);
     initViews(view);
-    getVideos();
     return view;
   }
 
   private void getVideos() {
-    Gson gson = new GsonBuilder()
-        .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-        .create();
-
-    Retrofit retrofit = new Retrofit.Builder()
-        .baseUrl(Constants.BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .build();
-
-    service = retrofit.create(CallMoviesAPI.class);
+    service = MovieDBApiHelper.getApiService();
     service.getMovieTrailers(mMovieId, Constants.API_KEY).enqueue(
         new Callback<VideosResponse>() {
           @Override
           public void onResponse(Call<VideosResponse> call,
                                  Response<VideosResponse> response) {
-            if(response.body()!=null){
-              intialisesTrailers(response.body());
+            if (response.body() != null) {
+
             }
 
           }
@@ -101,17 +101,24 @@ public class MovieTrailersFragment extends Fragment {
     adapter.setOnTrailerClickedListener(new TrailerListAdapter.OnTrailerSelectedListener() {
       @Override
       public void onTrailerClicked(int id, String vidioId) {
-        Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), vidioId, false,
-            false);
+        Intent intent =
+            YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), vidioId, false,
+                false);
         startActivity(intent);
       }
     });
   }
 
   private void initViews(View view) {
-// Initialize recycler view
+    // Initialize recycler view
     mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
     mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+  }
+
+
+  @Subscribe
+  public void getTrailerResponse(VideosResponse trailers){
+    intialisesTrailers(trailers);
   }
 
 }

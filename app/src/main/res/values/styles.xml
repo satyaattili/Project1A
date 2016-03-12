@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:actionOverflowButtonStyle">@style/MyActionButtonOverflow</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -18,13 +19,33 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
     <style name="MovieTabLayout" parent="Widget.Design.TabLayout">
-        <item name="tabTextAppearance">@style/MovieTabText</item>
-        <item name="tabSelectedTextColor">@color/md_red_800</item>
+        <item name="tabSelectedTextColor">@android:color/white</item>
+        <item name="tabIndicatorColor">?attr/colorAccent</item>
+        <item name="tabIndicatorHeight">5dp</item>
+        <item name="tabTextAppearance">@style/TextAppearance.Design.Tab</item>
     </style>
 
     <style name="MovieTabText" parent="TextAppearance.AppCompat.Button">
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <!-- Style to replace actionbar overflow icon. set item 'android:actionOverflowButtonStyle' in AppTheme -->
+    <style name="MyActionButtonOverflow" parent="android:style/Widget.Holo.Light.ActionButton.Overflow">
+        <item name="android:src">@drawable/ic_action_content_sort</item>
+        <item name="android:background">?android:attr/actionBarItemBackground</item>
+        <item name="android:contentDescription">"Sort"</item>
+    </style>
+
+
+    <style name="MovieTabStyle" parent="android:Widget">
+        <item name="tabIndicatorColor">?attr/colorAccent</item>
+        <item name="tabIndicatorHeight">2dp</item>
+        <item name="tabPaddingStart">12dp</item>
+        <item name="tabPaddingEnd">12dp</item>
+        <item name="tabBackground">?attr/selectableItemBackground</item>
+        <item name="tabTextAppearance">@style/TextAppearance.Design.Tab</item>
+        <item name="tabSelectedTextColor">?android:textColorPrimary</item>
     </style>
 
 </resources>

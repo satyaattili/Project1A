@@ -1,5 +1,6 @@
 package in.mobileappdev.moviesdb.services;
 
+import in.mobileappdev.moviesdb.models.Credits;
 import in.mobileappdev.moviesdb.models.MovieDetailsResponse;
 import in.mobileappdev.moviesdb.models.MovieResponse;
 import in.mobileappdev.moviesdb.models.ReviewResponse;
@@ -15,13 +16,15 @@ import retrofit2.http.Query;
 public interface CallMoviesAPI {
     //@GET("discover/movie?sort_by=popularity.desc")
     @GET("movie/popular")
-    Call<MovieResponse> getPopularLatestMovies(@Query("api_key") String apiKey);
+    Call<MovieResponse> getPopularLatestMovies(@Query("page") int pageId,@Query("api_key") String
+        apiKey);
 
     @GET("movie/latest")
-    Call<MovieResponse> getLatestMovies(@Query("api_key") String apiKey);
+    Call<MovieResponse> getLatestMovies(@Query("page") int pageId,@Query("api_key") String apiKey);
 
     @GET("movie/top_rated")
-    Call<MovieResponse> getTopRatedtMovies(@Query("api_key") String apiKey);
+    Call<MovieResponse> getTopRatedtMovies(@Query("page") int pageId,@Query("api_key") String
+        apiKey);
 
     @GET("movie/{id}")
     Call<MovieDetailsResponse> getMovieDetails(@Path("id") long movieId, @Query("api_key") String
@@ -33,6 +36,14 @@ public interface CallMoviesAPI {
 
     @GET("movie/{id}/reviews")
     Call<ReviewResponse> getMovieReviews(@Path("id") long movieId, @Query("api_key") String
+        apiKey);
+
+    @GET("movie/{id}/reviews")
+    Call<ReviewResponse> getRequestToken(@Path("id") long movieId, @Query("api_key") String
+        apiKey);
+
+    @GET("movie/{id}/credits")
+    Call<Credits> getCredits(@Path("id") long movieId, @Query("api_key") String
         apiKey);
 
 

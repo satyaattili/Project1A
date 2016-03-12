@@ -26,6 +26,7 @@ import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.adapters.MovieGridAdapter;
 import in.mobileappdev.moviesdb.models.MovieResponse;
 import in.mobileappdev.moviesdb.models.Result;
+import in.mobileappdev.moviesdb.rest.MovieDBApiHelper;
 import in.mobileappdev.moviesdb.services.CallMoviesAPI;
 import in.mobileappdev.moviesdb.utils.Constants;
 import in.mobileappdev.moviesdb.utils.Utils;
@@ -79,9 +80,9 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         mMovieRecyclerView.setAdapter(mMovieAdapter);
         mProgressBar.setVisibility(View.VISIBLE);
 
-        mApiService = Utils.getRertrofitApiServce();
+        mApiService = MovieDBApiHelper.getApiService();
 
-        mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
+        mApiService.getPopularLatestMovies(1,Constants.API_KEY).enqueue(this);
         mTitle = getString(R.string.filter_popular);
         mActionBar.setTitle(mTitle);
 
@@ -89,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         @Override
         public void onClick(View v) {
           hideErrorLayout();
-          mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(MainActivity.this);
+          mApiService.getPopularLatestMovies(1,Constants.API_KEY).enqueue(MainActivity.this);
         }
       });
     }
@@ -108,10 +109,10 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         clearDataSet();
         int id = item.getItemId();
         if (id == R.id.action_popular) {
-          mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
+          mApiService.getPopularLatestMovies(1,Constants.API_KEY).enqueue(this);
           mTitle = getString(R.string.filter_popular);
         }else if(id==R.id.action_toprated){
-          mApiService.getTopRatedtMovies(Constants.API_KEY).enqueue(this);
+          mApiService.getTopRatedtMovies(1,Constants.API_KEY).enqueue(this);
           mTitle = getString(R.string.filter_toprated);
         }
         mActionBar.setTitle(mTitle);
