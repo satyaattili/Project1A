@@ -31,13 +31,18 @@
                 android:scaleType="centerCrop"
                 android:fitsSystemWindows="true"
                 app:layout_collapseMode="parallax" />-->
-            <in.mobileappdev.moviesdb.views.AutoScrollViewPager
+            <!--<in.mobileappdev.moviesdb.views.AutoScrollViewPager
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/image_slideshow_pager"
                 android:fitsSystemWindows="true"
                 app:layout_collapseMode="parallax"
-            />
+            />-->
+            <fragment
+                android:name="com.google.android.youtube.player.YouTubePlayerSupportFragment"
+                android:id="@+id/youtube_player_toolbar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"

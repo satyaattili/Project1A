@@ -22,6 +22,8 @@ import in.mobileappdev.moviesdb.models.MovieDetailsResponse;
 import in.mobileappdev.moviesdb.models.VideosResponse;
 import in.mobileappdev.moviesdb.rest.MovieDBApiHelper;
 import in.mobileappdev.moviesdb.services.CallMoviesAPI;
+import in.mobileappdev.moviesdb.ui.DashboardActivity;
+import in.mobileappdev.moviesdb.ui.MovieDetailViewActivity;
 import in.mobileappdev.moviesdb.utils.BusProvider;
 import in.mobileappdev.moviesdb.utils.Constants;
 import retrofit2.Call;
@@ -75,25 +77,6 @@ public class MovieTrailersFragment extends Fragment {
     return view;
   }
 
-  private void getVideos() {
-    service = MovieDBApiHelper.getApiService();
-    service.getMovieTrailers(mMovieId, Constants.API_KEY).enqueue(
-        new Callback<VideosResponse>() {
-          @Override
-          public void onResponse(Call<VideosResponse> call,
-                                 Response<VideosResponse> response) {
-            if (response.body() != null) {
-
-            }
-
-          }
-
-          @Override
-          public void onFailure(Call<VideosResponse> call, Throwable t) {
-            Log.e(TAG, "OnFailure");
-          }
-        });
-  }
 
   private void intialisesTrailers(VideosResponse body) {
     TrailerListAdapter adapter = new TrailerListAdapter(getActivity(), body.getResults());
@@ -119,6 +102,7 @@ public class MovieTrailersFragment extends Fragment {
   @Subscribe
   public void getTrailerResponse(VideosResponse trailers){
     intialisesTrailers(trailers);
+    ((MovieDetailViewActivity) getActivity()).loadYoutubeVideo(trailers.getResults().get(0).getKey());
   }
 
 }

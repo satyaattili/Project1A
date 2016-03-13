@@ -8,6 +8,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
+
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerSupportFragment;
+import com.google.android.youtube.player.YouTubePlayerView;
 import com.squareup.picasso.Picasso;
 import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.adapters.SlideShowPagerAdapter;
@@ -28,8 +33,9 @@ public class MovieDetailViewActivity extends AppCompatActivity {
   private static final String TAG = MovieDetailViewActivity.class.getSimpleName();
   private CollapsingToolbarLayout collapsingToolbar;
   private AutoScrollViewPager mSlideShowViewPager;
-  private SlideShowPagerAdapter mSlideShowAdapter;
+  //private SlideShowPagerAdapter mSlideShowAdapter;
  // private ImageView mMoviePoster;
+  YouTubePlayerSupportFragment youTubePlayerView;
   private Toolbar toolbar;
   private long movieId = -1;
 
@@ -45,7 +51,11 @@ public class MovieDetailViewActivity extends AppCompatActivity {
     collapsingToolbar.setTitle("");
     //mMoviePoster = (ImageView) findViewById(R.id.backdrop);
 
-    mSlideShowViewPager = (AutoScrollViewPager) findViewById(R.id.image_slideshow_pager);
+    /** Initializing YouTube player view **/
+    youTubePlayerView = (YouTubePlayerSupportFragment) getSupportFragmentManager()
+        .findFragmentById(R.id.youtube_player_toolbar);
+
+    // mSlideShowViewPager = (AutoScrollViewPager) findViewById(R.id.image_slideshow_pager);
 
     String movieName = null;
     Intent resultIntent = getIntent();
@@ -55,11 +65,30 @@ public class MovieDetailViewActivity extends AppCompatActivity {
       collapsingToolbar.setTitle(movieName);
     }
 
-    MovieDBApiHelper.getApiService().getMovieImages(movieId, Constants.API_KEY).enqueue(imagesCallback);
-
     MovieDetailsFragment detailsFragment = MovieDetailsFragment.newInstance(movieId, movieName);
     getSupportFragmentManager().beginTransaction()
         .add(R.id.fragment_container, detailsFragment).commit();
+
+  }
+
+  public void loadYoutubeVideo(final String url){
+    youTubePlayerView.initialize(Constants.YOUTUBE_VIDEO_API_KEY,
+        new YouTubePlayer.OnInitializedListener() {
+          @Override
+          public void onInitializationSuccess(YouTubePlayer.Provider provider,
+                                              YouTubePlayer youTubePlayer,
+                                              boolean b) {
+            youTubePlayer.loadVideo(url);
+            youTubePlayer.play();
+            youTubePlayer.setPlayerStyle(YouTubePlayer.PlayerStyle.MINIMAL);
+          }
+
+          @Override
+          public void onInitializationFailure(YouTubePlayer.Provider provider,
+                                              YouTubeInitializationResult youTubeInitializationResult) {
+
+          }
+        });
 
   }
 
@@ -70,64 +99,6 @@ public class MovieDetailViewActivity extends AppCompatActivity {
             (mMoviePoster);*/
   }
 
-  Callback<MovieImages> imagesCallback = new Callback<MovieImages>() {
-    @Override
-    public void onResponse(Call<MovieImages> call, Response<MovieImages> response) {
-      if(response.isSuccess() && response.body()!=null){
-        mSlideShowAdapter = new SlideShowPagerAdapter(MovieDetailViewActivity.this, response.body
-            ());
-        mSlideShowViewPager.setAdapter(mSlideShowAdapter);
-        mSlideShowViewPager.setAutoScrollDurationFactor(10);
-        mSlideShowViewPager.setInterval(3000);
-       //\ mSlideShowViewPager.setPageTransformer(true, new ZoomOutPageTransformer());
-        mSlideShowAdapter.notifyDataSetChanged();
-        mSlideShowViewPager.startAutoScroll();
-      }
-    }
 
-    @Override
-    public void onFailure(Call<MovieImages> call, Throwable t) {
-
-    }
-  };
-
-  public class ZoomOutPageTransformer implements ViewPager.PageTransformer {
-    private static final float MIN_SCALE = 0.85f;
-    private static final float MIN_ALPHA = 0.5f;
-
-    public void transformPage(View view, float position) {
-      int pageWidth = view.getWidth();
-      int pageHeight = view.getHeight();
-
-      if (position < -1) { // [-Infinity,-1)
-        // This page is way off-screen to the left.
-        view.setAlpha(0);
-
-      } else if (position <= 1) { // [-1,1]
-        // Modify the default slide transition to shrink the page as well
-        float scaleFactor = Math.max(MIN_SCALE, 1 - Math.abs(position));
-        float vertMargin = pageHeight * (1 - scaleFactor) / 2;
-        float horzMargin = pageWidth * (1 - scaleFactor) / 2;
-        if (position < 0) {
-          view.setTranslationX(horzMargin - vertMargin / 2);
-        } else {
-          view.setTranslationX(-horzMargin + vertMargin / 2);
-        }
-
-        // Scale the page down (between MIN_SCALE and 1)
-        view.setScaleX(scaleFactor);
-        view.setScaleY(scaleFactor);
-
-        // Fade the page relative to its size.
-        view.setAlpha(MIN_ALPHA +
-            (scaleFactor - MIN_SCALE) /
-                (1 - MIN_SCALE) * (1 - MIN_ALPHA));
-
-      } else { // (1,+Infinity]
-        // This page is way off-screen to the right.
-        view.setAlpha(0);
-      }
-    }
-  }
 
 }
