@@ -68,12 +68,16 @@ public class MovieOverViewFragment extends Fragment {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    BusProvider.getInstance().register(this);
     if (getArguments() != null) {
       mMovieId = getArguments().getLong(ARG_PARAM1);
     }
   }
 
+  @Override
+  public void onStart() {
+    super.onStart();
+    BusProvider.getInstance().register(this);
+  }
 
   @Override
   public void onStop() {
@@ -128,7 +132,7 @@ public class MovieOverViewFragment extends Fragment {
     leftButton2.setText(String.valueOf(movie.getRevenue()));
 
     rightButton1.setText(String.valueOf(movie.getVote_average()));
-    rightButton2.setText(String.valueOf(movie.getRuntime()));
+    rightButton2.setText(Utils.getFormattedTime(movie.getRuntime()));
 
     String imageurl = Constants.IMAGE_BASE_URL+movie.getBackdrop_path();
     String posterUrl = Constants.IMAGE_BASE_URL+movie.getPoster_path();

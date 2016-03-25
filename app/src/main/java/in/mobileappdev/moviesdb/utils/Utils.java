@@ -7,8 +7,10 @@ import android.net.NetworkInfo;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
 import in.mobileappdev.moviesdb.services.CallMoviesAPI;
-import retrofit2.GsonConverterFactory;
 import retrofit2.Retrofit;
 
 /**
@@ -31,6 +33,15 @@ public class Utils {
           hasConnectedMobile = true;
     }
     return hasConnectedWifi || hasConnectedMobile;
+  }
+
+  public static String getFormattedTime(long minutes){
+    long hours = TimeUnit.MINUTES.toHours(120);
+    long remainMinute = minutes - TimeUnit.HOURS.toMinutes(hours);
+    String result = String.format(Locale.getDefault(),"%02d", hours) + ":"
+        + String.format(Locale.getDefault(),"%02d", remainMinute);
+
+    return result;
   }
 
 

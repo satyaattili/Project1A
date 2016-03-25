@@ -17,7 +17,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Cast" android:layout_centerInParent="true"/>
+                        android:text="@string/txt_cast"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:layout_centerInParent="true"/>
                 </RelativeLayout>
 
                 <android.support.v7.widget.RecyclerView
@@ -26,12 +29,18 @@
                     android:layout_height="wrap_content"/>
 
                 <RelativeLayout android:layout_width="match_parent" android:layout_height="50dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                              android:text="Crew" android:layout_centerInParent="true"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/txt_crew"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:layout_centerInParent="true"/>
                 </RelativeLayout>
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/crew_list"
+                    android:paddingBottom="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 

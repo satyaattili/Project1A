@@ -26,7 +26,6 @@ import in.mobileappdev.moviesdb.utils.BusProvider;
 import in.mobileappdev.moviesdb.utils.Constants;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.GsonConverterFactory;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
@@ -55,10 +54,15 @@ public class MovieTrailersFragment extends Fragment {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    BusProvider.getInstance().register(this);
     if (getArguments() != null) {
       mMovieId = getArguments().getLong(ARG_PARAM1);
     }
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    BusProvider.getInstance().register(this);
   }
 
   @Override
@@ -76,7 +80,7 @@ public class MovieTrailersFragment extends Fragment {
   }
 
   private void getVideos() {
-    service = MovieDBApiHelper.getApiService();
+    service = MovieDBApiHelper.getApiService(getActivity());
     service.getMovieTrailers(mMovieId, Constants.API_KEY).enqueue(
         new Callback<VideosResponse>() {
           @Override
@@ -102,7 +106,7 @@ public class MovieTrailersFragment extends Fragment {
       @Override
       public void onTrailerClicked(int id, String vidioId) {
         Intent intent =
-            YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), vidioId, false,
+            YouTubeIntents.createPlayVideoIntentWithOptions(getActivity().getApplicationContext(), vidioId, false,
                 false);
         startActivity(intent);
       }
