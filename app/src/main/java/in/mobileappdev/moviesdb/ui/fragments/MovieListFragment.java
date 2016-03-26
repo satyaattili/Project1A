@@ -3,6 +3,7 @@ package in.mobileappdev.moviesdb.ui.fragments;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +22,9 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import in.mobileappdev.moviesdb.MovieDBApplication;
 import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.adapters.MovieGridAdapter;
 import in.mobileappdev.moviesdb.models.MovieResponse;
@@ -37,19 +41,17 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
 
   private static final String TAG = MovieListFragment.class.getSimpleName() ;
   private ArrayList<Result> movies = new ArrayList<>();
-  private ProgressBar mProgressBar;
   private MovieGridAdapter mMovieAdapter;
   private CallMoviesAPI mApiService;
   private String mTitle;
-  private LinearLayout mErrorLayout;
-  private Button mRetryButton;
-  private TextView mErrorMessage;
-  private int currentPage;
-  //private ActionBar mActionBar;
-  private RecyclerView mMovieRecyclerView;
+  @Bind(R.id.progressBar) ProgressBar mProgressBar;
+  @Bind(R.id.error_layout) LinearLayout mErrorLayout;
+  @Bind(R.id.btn_retry) Button mRetryButton;
+  @Bind(R.id.error_message) TextView mErrorMessage;
+  @Bind(R.id.movie_list) RecyclerView mMovieRecyclerView;
+  @Bind(R.id.swipe_refresh_layout) SwipeRefreshLayout mSwipeRefreshLayout;
   private OnMovieSelectedListener mOnMovieSelectedListener;
-  private boolean isPopular = false;
-
+  private int currentPage;
   private boolean loading = true;
   int pastVisiblesItems, visibleItemCount, totalItemCount;
 
@@ -65,28 +67,30 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setHasOptionsMenu(true);
-    mApiService = MovieDBApiHelper.getApiService();
+    mApiService = MovieDBApiHelper.getApiService(getActivity());
   }
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
     View view =  inflater.inflate(R.layout.fragment_movie_list, container, false);
-    initviews(view);
+    ButterKnife.bind(this, view);
+    initviews();
     return view;
   }
 
-  private void initviews(View view) {
-    mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+  @Override
+  public void onResume() {
+    super.onResume();
+  }
 
-    mErrorLayout = (LinearLayout) view.findViewById(R.id.error_layout);
-    mErrorMessage = (TextView) view.findViewById(R.id.error_message);
-    mRetryButton = (Button) view.findViewById(R.id.btn_retry);
-    mMovieRecyclerView = (RecyclerView) view.findViewById(R.id.movie_list);
+  private void initviews() {
+
     mMovieRecyclerView.setHasFixedSize(true);
     final GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(),2);
     mMovieRecyclerView.setLayoutManager(gridLayoutManager);
 
+    //animation
     RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
     itemAnimator.setAddDuration(3000);
     itemAnimator.setRemoveDuration(3000);
@@ -104,6 +108,7 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
           pastVisiblesItems = gridLayoutManager.findFirstVisibleItemPosition();
 
           if (loading) {
+            mSwipeRefreshLayout.setRefreshing(true);
             if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
               loading = false;
               Log.v("...", "Last Item Wow !");
@@ -128,7 +133,8 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
     mProgressBar.setVisibility(View.VISIBLE);
 
     mApiService.getPopularLatestMovies(1,Constants.API_KEY).enqueue(this);
-    isPopular = true;
+    MovieDBApplication.getInstance().savePreference(Constants.PREF_KEY_SELECTED_CATEGORY,
+        Constants.PREF_POPULAR_MOVIE);
     mTitle = getString(R.string.filter_popular);
 
     mRetryButton.setOnClickListener(new View.OnClickListener() {
@@ -138,31 +144,63 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
         //mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
       }
     });
+
+    mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+      @Override
+      public void onRefresh() {
+        getMore(1);
+      }
+    });
   }
 
   private void getMore(int page) {
-    if(isPopular){
-      mApiService.getPopularLatestMovies(page,Constants.API_KEY).enqueue(this);
-    }else{
-      mApiService.getTopRatedtMovies(page,Constants.API_KEY).enqueue(this);
+
+    mSwipeRefreshLayout.setRefreshing(true);
+
+    switch (MovieDBApplication.getInstance().getIntPreference(Constants.PREF_KEY_SELECTED_CATEGORY)){
+      case 0:
+        mApiService.getPopularLatestMovies(page,Constants.API_KEY).enqueue(this);
+        MovieDBApplication.getInstance().savePreference(Constants.PREF_KEY_SELECTED_CATEGORY,
+            Constants.PREF_POPULAR_MOVIE);
+        break;
+
+      case 1:
+        mApiService.getTopRatedtMovies(page,Constants.API_KEY).enqueue(this);
+        MovieDBApplication.getInstance().savePreference(Constants.PREF_KEY_SELECTED_CATEGORY,
+            Constants.PREF_TOP_RATED_MOVIE);
+        break;
+
     }
 
   }
+
 
 
   @Override
   public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+    mSwipeRefreshLayout.setRefreshing(false);
+
     if(response.body() != null){
       movies.addAll(response.body().getResults());
       currentPage = response.body().getPage();
+      int total = response.body().getTotalPages();
+      Log.e(TAG, "++++++++ CURRENT PAGE : "+currentPage+" TOTAL PAGES : "+total);
+      /*if(currentPage<total){
+        loading = true;
+      }*/
+      Log.e(TAG, "Current Page : "+currentPage+"SIze of the movies recieved : "+movies.size());
       hideErrorLayout();
       mMovieAdapter.notifyDataSetChanged();
     }
     mProgressBar.setVisibility(View.GONE);
+    if(movies.size()==0){
+      showErrorLayout();
+    }
   }
 
   @Override
   public void onFailure(Call<MovieResponse> call, Throwable t) {
+    mSwipeRefreshLayout.setRefreshing(false);
     if(movies.size()==0){
       showErrorLayout();
     }
@@ -209,11 +247,13 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
     clearDataSet();
     int id = item.getItemId();
     if (id == R.id.action_popular) {
-      isPopular= true;
+      MovieDBApplication.getInstance().savePreference(Constants.PREF_KEY_SELECTED_CATEGORY,
+          Constants.PREF_POPULAR_MOVIE);
       mApiService.getPopularLatestMovies(1,Constants.API_KEY).enqueue(this);
       mTitle = getString(R.string.filter_popular);
     }else if(id==R.id.action_toprated){
-      isPopular = false;
+      MovieDBApplication.getInstance().savePreference(Constants.PREF_KEY_SELECTED_CATEGORY,
+          Constants.PREF_TOP_RATED_MOVIE);
       mApiService.getTopRatedtMovies(1,Constants.API_KEY).enqueue(this);
       mTitle = getString(R.string.filter_toprated);
     }
@@ -238,7 +278,4 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
           + " must implement OnHeadlineSelectedListener");
     }
   }
-
-
-
 }

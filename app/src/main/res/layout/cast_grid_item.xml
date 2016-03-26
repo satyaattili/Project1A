@@ -16,8 +16,8 @@
             android:id="@+id/cProfilePic"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/default_movie"
-            android:scaleType="fitXY"
+            android:background="@drawable/default_profile"
+            android:scaleType="centerCrop"
             android:adjustViewBounds="true"
             android:layout_centerInParent="true"/>
 

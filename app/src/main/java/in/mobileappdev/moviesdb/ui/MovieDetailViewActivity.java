@@ -55,7 +55,8 @@ public class MovieDetailViewActivity extends AppCompatActivity {
       collapsingToolbar.setTitle(movieName);
     }
 
-    MovieDBApiHelper.getApiService().getMovieImages(movieId, Constants.API_KEY).enqueue(imagesCallback);
+    MovieDBApiHelper.getApiService(this).getMovieImages(movieId, Constants.API_KEY).enqueue
+        (imagesCallback);
 
     MovieDetailsFragment detailsFragment = MovieDetailsFragment.newInstance(movieId, movieName);
     getSupportFragmentManager().beginTransaction()
@@ -73,7 +74,7 @@ public class MovieDetailViewActivity extends AppCompatActivity {
   Callback<MovieImages> imagesCallback = new Callback<MovieImages>() {
     @Override
     public void onResponse(Call<MovieImages> call, Response<MovieImages> response) {
-      if(response.isSuccess() && response.body()!=null){
+      if( response.body()!=null){
         mSlideShowAdapter = new SlideShowPagerAdapter(MovieDetailViewActivity.this, response.body
             ());
         mSlideShowViewPager.setAdapter(mSlideShowAdapter);

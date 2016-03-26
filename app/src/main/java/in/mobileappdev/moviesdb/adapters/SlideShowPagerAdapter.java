@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.models.Movie;
@@ -46,10 +47,8 @@ public class SlideShowPagerAdapter extends PagerAdapter {
   @Override
   public Object instantiateItem(ViewGroup container, int position) {
     View itemView = mLayoutInflater.inflate(R.layout.slideshow_pager_item, container, false);
-   // String imageUrl = Constants.IMAGE_BASE_URL+"/8uO0gUM8aNqYLs1OsTBQiXu0fEv.jpg";
-    //if(movieImages.getBackdrops().get(position).getFilePath() != null){
-      String imageUrl = Constants.IMAGE_BASE_URL+movieImages.getBackdrops().get(position).getFilePath();
-    //}
+    position = (int)(Math.random() * movieImages.getBackdrops().size());
+    String imageUrl = Constants.IMAGE_BASE_URL+movieImages.getBackdrops().get(position).getFilePath();
     ImageView imageView = (ImageView) itemView.findViewById(R.id.slide_image);
     Picasso.with(mContext).load(imageUrl).placeholder(R.drawable.ic_launcher)
         .into

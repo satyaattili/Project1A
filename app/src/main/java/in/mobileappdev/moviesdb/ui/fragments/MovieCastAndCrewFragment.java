@@ -58,7 +58,6 @@ public class MovieCastAndCrewFragment extends Fragment {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    BusProvider.getInstance().register(this);
     if (getArguments() != null) {
       mMovieID = getArguments().getLong(ARG_PARAM1);
     }
@@ -70,6 +69,8 @@ public class MovieCastAndCrewFragment extends Fragment {
     View view = inflater.inflate(R.layout.fragment_cast_and_crew, container, false);
     ButterKnife.bind(this, view);
     mCastRecyclerView.setHasFixedSize(true);
+    mCrewRecyclerView.setNestedScrollingEnabled(false);
+    mCastRecyclerView.setNestedScrollingEnabled(false);
     LinearLayoutManager layoutManager
         = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
     mCastRecyclerView.setLayoutManager(layoutManager);
@@ -92,6 +93,13 @@ public class MovieCastAndCrewFragment extends Fragment {
     movieCastAdapter.notifyDataSetChanged();
     mCrewDataSet.addAll(credits.getCrew());
     mMovieCrewAdapter.notifyDataSetChanged();
+  }
+
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    BusProvider.getInstance().register(this);
   }
 
   @Override

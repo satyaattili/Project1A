@@ -12,23 +12,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.youtube.player.YouTubeIntents;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.squareup.otto.Subscribe;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.adapters.TrailerListAdapter;
-import in.mobileappdev.moviesdb.models.MovieDetailsResponse;
 import in.mobileappdev.moviesdb.models.VideosResponse;
-import in.mobileappdev.moviesdb.rest.MovieDBApiHelper;
 import in.mobileappdev.moviesdb.services.CallMoviesAPI;
 import in.mobileappdev.moviesdb.utils.BusProvider;
-import in.mobileappdev.moviesdb.utils.Constants;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.GsonConverterFactory;
-import retrofit2.Response;
-import retrofit2.Retrofit;
+
 
 
 public class MovieTrailersFragment extends Fragment {
@@ -37,7 +30,7 @@ public class MovieTrailersFragment extends Fragment {
   private static final String TAG = MovieTrailersFragment.class.getSimpleName();
   private long mMovieId;
   private CallMoviesAPI service;
-  private RecyclerView mRecyclerView;
+  @Bind(R.id.recycler_view) RecyclerView mRecyclerView;
 
 
   public MovieTrailersFragment() {
@@ -55,10 +48,15 @@ public class MovieTrailersFragment extends Fragment {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    BusProvider.getInstance().register(this);
     if (getArguments() != null) {
       mMovieId = getArguments().getLong(ARG_PARAM1);
     }
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    BusProvider.getInstance().register(this);
   }
 
   @Override
@@ -70,29 +68,10 @@ public class MovieTrailersFragment extends Fragment {
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
-    View view =  inflater.inflate(R.layout.fragment_movie_trailers, container, false);
-    initViews(view);
+    View view = inflater.inflate(R.layout.fragment_movie_trailers, container, false);
+    ButterKnife.bind(this, view);
+    mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     return view;
-  }
-
-  private void getVideos() {
-    service = MovieDBApiHelper.getApiService();
-    service.getMovieTrailers(mMovieId, Constants.API_KEY).enqueue(
-        new Callback<VideosResponse>() {
-          @Override
-          public void onResponse(Call<VideosResponse> call,
-                                 Response<VideosResponse> response) {
-            if (response.body() != null) {
-
-            }
-
-          }
-
-          @Override
-          public void onFailure(Call<VideosResponse> call, Throwable t) {
-            Log.e(TAG, "OnFailure");
-          }
-        });
   }
 
   private void intialisesTrailers(VideosResponse body) {
@@ -102,22 +81,18 @@ public class MovieTrailersFragment extends Fragment {
       @Override
       public void onTrailerClicked(int id, String vidioId) {
         Intent intent =
-            YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), vidioId, false,
+            YouTubeIntents.createPlayVideoIntentWithOptions(getActivity().getApplicationContext(),
+                vidioId, false,
                 false);
         startActivity(intent);
       }
     });
   }
 
-  private void initViews(View view) {
-    // Initialize recycler view
-    mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-    mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-  }
 
 
   @Subscribe
-  public void getTrailerResponse(VideosResponse trailers){
+  public void getTrailerResponse(VideosResponse trailers) {
     intialisesTrailers(trailers);
   }
 

@@ -32,7 +32,6 @@ import in.mobileappdev.moviesdb.utils.Constants;
 import in.mobileappdev.moviesdb.utils.Utils;
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.GsonConverterFactory;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
@@ -80,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         mMovieRecyclerView.setAdapter(mMovieAdapter);
         mProgressBar.setVisibility(View.VISIBLE);
 
-        mApiService = MovieDBApiHelper.getApiService();
+        mApiService = MovieDBApiHelper.getApiService(this);
 
         mApiService.getPopularLatestMovies(1,Constants.API_KEY).enqueue(this);
         mTitle = getString(R.string.filter_popular);

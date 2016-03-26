@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.zip.Inflater;
 
 import in.mobileappdev.moviesdb.R;
+import in.mobileappdev.moviesdb.db.DatabaseHandler;
 import in.mobileappdev.moviesdb.models.Movie;
 import in.mobileappdev.moviesdb.models.Result;
 import in.mobileappdev.moviesdb.utils.Constants;
@@ -60,6 +61,11 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
                 }
             }
         });
+        if(DatabaseHandler.getInstance(mContext).isExistsInFavorites(currentMovie.getId())){
+            holder.mFavorite.setVisibility(View.VISIBLE);
+        }else{
+            holder.mFavorite.setVisibility(View.GONE);
+        }
     }
 
 
@@ -72,11 +78,13 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
     public class MovieViewHolder  extends RecyclerView.ViewHolder{
         //protected TextView mName;
         protected ImageView mThumbnail;
+        protected ImageView mFavorite;
 
         public MovieViewHolder(View v) {
             super(v);
            //mName =  (TextView) v.findViewById(R.id.movie_name);
             mThumbnail = (ImageView)  v.findViewById(R.id.movie_thumbnail);
+            mFavorite = (ImageView) v.findViewById(R.id.fav_icon);
         }
     }
 

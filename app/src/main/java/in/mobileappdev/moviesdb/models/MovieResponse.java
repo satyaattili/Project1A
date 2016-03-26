@@ -10,8 +10,8 @@ public class MovieResponse {
 
     private Integer page;
     private List<Result> results = new ArrayList<Result>();
-    private Integer totalPages;
-    private Integer totalResults;
+    private Integer total_pages;
+    private Integer total_results;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
@@ -53,19 +53,19 @@ public class MovieResponse {
     /**
      * 
      * @return
-     *     The totalPages
+     *     The total_pages
      */
     public Integer getTotalPages() {
-        return totalPages;
+        return total_pages;
     }
 
     /**
      * 
-     * @param totalPages
+     * @param total_pages
      *     The total_pages
      */
-    public void setTotalPages(Integer totalPages) {
-        this.totalPages = totalPages;
+    public void setTotalPages(Integer total_pages) {
+        this.total_pages = total_pages;
     }
 
     /**
@@ -74,7 +74,7 @@ public class MovieResponse {
      *     The totalResults
      */
     public Integer getTotalResults() {
-        return totalResults;
+        return total_results;
     }
 
     /**
@@ -83,7 +83,7 @@ public class MovieResponse {
      *     The total_results
      */
     public void setTotalResults(Integer totalResults) {
-        this.totalResults = totalResults;
+        this.total_results = totalResults;
     }
 
     public Map<String, Object> getAdditionalProperties() {
