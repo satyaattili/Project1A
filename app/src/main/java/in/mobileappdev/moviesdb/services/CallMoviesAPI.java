@@ -17,12 +17,12 @@ import retrofit2.http.Query;
  */
 public interface CallMoviesAPI {
     //@GET("discover/movie?sort_by=popularity.desc")
-    //@Headers("Cache-Control: max-age=640000")
+    @Headers("Cache-Control: max-age=640000")
     @GET("movie/popular")
     Call<MovieResponse> getPopularLatestMovies(@Query("page") int pageId,@Query("api_key") String
         apiKey);
 
-    //@Headers("Cache-Control: max-age=640000")
+    @Headers("Cache-Control: max-age=640000")
     @GET("movie/latest")
     Call<MovieResponse> getLatestMovies(@Query("page") int pageId,@Query("api_key") String apiKey);
 
@@ -32,14 +32,17 @@ public interface CallMoviesAPI {
     Call<MovieResponse> getTopRatedtMovies(@Query("page") int pageId,@Query("api_key") String
         apiKey);
 
+    @Headers("Cache-Control: max-age=640000")
     @GET("movie/{id}")
     Call<MovieDetailsResponse> getMovieDetails(@Path("id") long movieId, @Query("api_key") String
         apiKey);
 
+    @Headers("Cache-Control: max-age=640000")
     @GET("movie/{id}/videos")
     Call<VideosResponse> getMovieTrailers(@Path("id") long movieId, @Query("api_key") String
         apiKey);
 
+    @Headers("Cache-Control: max-age=640000")
     @GET("movie/{id}/reviews")
     Call<ReviewResponse> getMovieReviews(@Path("id") long movieId, @Query("api_key") String
         apiKey);
@@ -48,10 +51,12 @@ public interface CallMoviesAPI {
     Call<ReviewResponse> getRequestToken(@Path("id") long movieId, @Query("api_key") String
         apiKey);
 
+    @Headers("Cache-Control: max-age=640000")
     @GET("movie/{id}/credits")
     Call<Credits> getCredits(@Path("id") long movieId, @Query("api_key") String
         apiKey);
 
+    @Headers("Cache-Control: max-age=640000")
     @GET("movie/{id}/images")
     Call<MovieImages> getMovieImages(@Path("id") long movieId, @Query("api_key") String
         apiKey);

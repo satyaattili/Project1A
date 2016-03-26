@@ -148,7 +148,7 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
     mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
       @Override
       public void onRefresh() {
-        //getMore();
+        getMore(1);
       }
     });
   }
@@ -183,8 +183,9 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
     if(response.body() != null){
       movies.addAll(response.body().getResults());
       currentPage = response.body().getPage();
-      /*int total = response.body().getTotalPages();
-      if(currentPage<total){
+      int total = response.body().getTotalPages();
+      Log.e(TAG, "++++++++ CURRENT PAGE : "+currentPage+" TOTAL PAGES : "+total);
+      /*if(currentPage<total){
         loading = true;
       }*/
       Log.e(TAG, "Current Page : "+currentPage+"SIze of the movies recieved : "+movies.size());
@@ -192,6 +193,9 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
       mMovieAdapter.notifyDataSetChanged();
     }
     mProgressBar.setVisibility(View.GONE);
+    if(movies.size()==0){
+      showErrorLayout();
+    }
   }
 
   @Override
@@ -274,9 +278,4 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
           + " must implement OnHeadlineSelectedListener");
     }
   }
-
-
-
-
-
 }

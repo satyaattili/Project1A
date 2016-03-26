@@ -51,7 +51,7 @@ public class DashboardActivity extends AppCompatActivity implements
   @Override
   public void onMovieSelected(long mid, String movieName) {
 
-    if(!Utils.hasNetworkConnection(this)){
+/*    if(!Utils.hasNetworkConnection(this)){
       Snackbar.make(findViewById(R.id.parentlayout), R.string.no_network_msg, Snackbar
           .LENGTH_LONG).setAction("RETRY", new View.OnClickListener() {
         @Override
@@ -60,7 +60,7 @@ public class DashboardActivity extends AppCompatActivity implements
         }
       }).setActionTextColor(getResources().getColor(android.R.color.holo_red_light )).show();
       return;
-    }
+    }*/
 
     if (articleFrag != null) {
         articleFrag.updateArticleView(mid);

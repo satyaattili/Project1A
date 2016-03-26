@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.squareup.otto.Bus;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -86,10 +87,10 @@ public class MovieDetailsFragment extends Fragment {
     viewPager = (ViewPager) view.findViewById(R.id.viewpager);
     viewPager.setOffscreenPageLimit(3);
 
-    setupViewPager(viewPager, mMovieId);
+    //setupViewPager(viewPager, mMovieId);
 
     tabLayout = (TabLayout) view.findViewById(R.id.tabs);
-    tabLayout.setupWithViewPager(viewPager);
+
 
   }
 
@@ -158,7 +159,6 @@ public class MovieDetailsFragment extends Fragment {
   public boolean onOptionsItemSelected(MenuItem item) {
     int id = item.getItemId();
     if (id == R.id.action_favorite) {
-
       if(item.isChecked()){
         item.setChecked(false);
         item.setIcon(R.drawable.ic_action_favorite_outline);
@@ -171,10 +171,9 @@ public class MovieDetailsFragment extends Fragment {
         Snackbar.make(getView(), "Added to your Favourites", Snackbar.LENGTH_SHORT).show();
       }
     }else if(id==R.id.home){
-
       getActivity().onBackPressed();
     }
-    return super.onOptionsItemSelected(item);
+    return true;
   }
 
 
@@ -225,6 +224,7 @@ public class MovieDetailsFragment extends Fragment {
             (reviewResponseCallback);
         BusProvider.getInstance().post(response.body());
         mProgressLoading.setVisibility(View.GONE);
+        tabLayout.setupWithViewPager(viewPager);
       }
     }
 
@@ -250,6 +250,26 @@ public class MovieDetailsFragment extends Fragment {
     }
   };
 
+
+  /*Callback<Type> retrofitCallBAck = new Callback<Type>() {
+    @Override
+    public void onResponse(Call<Type> call, Response<Type> response) {
+
+      if(response != null && response.body() instanceof Credits)
+
+      if( response.body()!=null && response.body().getCast().size()>0){
+        adapter.addFragment(MovieCastAndCrewFragment.newInstance(mMovieId), "CAST");
+        adapter.notifyDataSetChanged();
+        BusProvider.getInstance().post(response.body());
+      }
+    }
+
+    @Override
+    public void onFailure(Call<Type> call, Throwable t) {
+
+    }
+  };
+*/
 
 
   @Override

@@ -1,36 +1,34 @@
 package in.mobileappdev.moviesdb.ui.fragments;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import in.mobileappdev.moviesdb.R;
-import in.mobileappdev.moviesdb.models.Credits;
+import in.mobileappdev.moviesdb.models.Genre;
 import in.mobileappdev.moviesdb.models.MovieDetailsResponse;
-import in.mobileappdev.moviesdb.rest.MovieDBApiHelper;
 import in.mobileappdev.moviesdb.services.CallMoviesAPI;
 import in.mobileappdev.moviesdb.ui.MovieDetailViewActivity;
 import in.mobileappdev.moviesdb.utils.BusProvider;
 import in.mobileappdev.moviesdb.utils.Constants;
 import in.mobileappdev.moviesdb.utils.Utils;
 import in.mobileappdev.moviesdb.views.CircleImageView;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 
 public class MovieOverViewFragment extends Fragment {
@@ -39,18 +37,19 @@ public class MovieOverViewFragment extends Fragment {
   private long mMovieId;
   private static final String TAG = MovieOverViewFragment.class.getSimpleName();
   private CallMoviesAPI service;
-  private CollapsingToolbarLayout collapsingToolbar;
-  private ImageView mMoviePoster;
-  private CircleImageView mThumbnailImage;
-  private ProgressBar mLoading;
-  private NestedScrollView mMovieContent;
-  private TextView mOverView, mStatus, mVoting, mReleaseDate;
-  private CardView mMovieStatusCard,mMovieVotingCard;
+  @Bind(R.id.movie_thumbnail) CircleImageView mThumbnailImage;
+  @Bind(R.id.progressBar) ProgressBar mLoading;
+  @Bind(R.id.movie_content) NestedScrollView mMovieContent;
+  @Bind(R.id.movie_overview) TextView mOverView;
+  @Bind(R.id.tag_line) TextView mTagline;
+  @Bind(R.id.generes_parent) LinearLayout mMovieGeneres;
 
   @Bind(R.id.lb1) TextView leftButton1;
   @Bind(R.id.lb2) TextView leftButton2;
   @Bind(R.id.rb1) TextView rightButton1;
   @Bind(R.id.rb2) TextView rightButton2;
+
+  @Bind(R.id.vote_avg_card) CardView votingCard;
 
 
   public MovieOverViewFragment() {
@@ -90,28 +89,8 @@ public class MovieOverViewFragment extends Fragment {
                            Bundle savedInstanceState) {
     View view =  inflater.inflate(R.layout.fragment_over_view, container, false);
     ButterKnife.bind(this, view);
-    initViews(view);
     return view;
   }
-
-
-  /**
-   * Intialise views
-   * @param view
-   */
-  private void initViews(View view) {
-
-    mOverView= (TextView) view.findViewById(R.id.movie_overview);
-    mStatus= (TextView) view.findViewById(R.id.movie_status);
-    mVoting= (TextView) view.findViewById(R.id.movie_voting);
-    mReleaseDate = (TextView)view.findViewById(R.id.release_date);
-    mLoading = (ProgressBar) view.findViewById(R.id.progressBar);
-    mMovieContent = (NestedScrollView) view.findViewById(R.id.movie_content);
-    mMovieStatusCard = (CardView) view.findViewById(R.id.status_card);
-    mMovieVotingCard = (CardView) view.findViewById(R.id.voting_card);
-    mThumbnailImage = (CircleImageView) view.findViewById(R.id.movie_thumbnail);
-  }
-
 
   @Subscribe
   public void getOverViewResponse(MovieDetailsResponse movieDetails){
@@ -123,13 +102,14 @@ public class MovieOverViewFragment extends Fragment {
    * Display Movie Overview
    * @param movie
    */
+  @TargetApi(Build.VERSION_CODES.M)
   private void displayMovieDetails(MovieDetailsResponse movie){
 
     mLoading.setVisibility(View.GONE);
     mMovieContent.setVisibility(View.VISIBLE);
 
-    leftButton1.setText(String.valueOf(movie.getPopularity()));
-    leftButton2.setText(String.valueOf(movie.getRevenue()));
+    leftButton1.setText(String.valueOf(movie.getImdb_id()));
+    leftButton2.setText(movie.getRelease_date());
 
     rightButton1.setText(String.valueOf(movie.getVote_average()));
     rightButton2.setText(Utils.getFormattedTime(movie.getRuntime()));
@@ -144,23 +124,34 @@ public class MovieOverViewFragment extends Fragment {
     }
 
     mOverView.setText(movie.getOverview());
-    mStatus.setText(movie.getStatus());
-    mReleaseDate.setText(""+movie.getRelease_date());
-    if(movie.getStatus().toLowerCase().equals("released")){
-      mMovieStatusCard.setCardBackgroundColor(getResources().getColor(R.color.md_green_800));
-    }else{
-      mMovieStatusCard.setCardBackgroundColor(getResources().getColor(R.color.md_orange_800));
-    }
+    mTagline.setText(movie.getTagline());
     double voting = movie.getVote_average();
-    mVoting.setText(String.valueOf(voting) + "/10");
     if(voting<= Constants.AVERAGE){
-      mMovieVotingCard.setCardBackgroundColor(getResources().getColor(R.color.md_red_800));
+      votingCard.setCardBackgroundColor(getResources().getColor(R.color.md_red_800));
     }else if(voting>Constants.AVERAGE && voting<Constants.GOOD){
-      mMovieVotingCard.setCardBackgroundColor(getResources().getColor(R.color.md_orange_800));
+      votingCard.setCardBackgroundColor(getResources().getColor(R.color.md_orange_800));
     }else if(voting>=Constants.GOOD){
-      mMovieVotingCard.setCardBackgroundColor(getResources().getColor(R.color.md_green_800));
+      votingCard.setCardBackgroundColor(getResources().getColor(R.color.md_green_800));
     }
 
+
+    //generes
+    List<Genre> generes = movie.getGenres();
+    for(Genre genre : generes){
+      TextView genreString = new TextView(getActivity());
+      genreString.setText(genre.getName());
+      genreString.setPadding(20,20,20,20);
+//      genreString.setTextAppearance(R.style.GenreText);
+      genreString.setBackgroundResource(R.drawable.rounded_bg);
+      LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+          LinearLayout.LayoutParams.WRAP_CONTENT,
+          LinearLayout.LayoutParams.WRAP_CONTENT
+      );
+      params.setMargins(10, 10,10,10);
+      genreString.setLayoutParams(params);
+      mMovieGeneres.addView(genreString);
+
+    }
   }
 
 

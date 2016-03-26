@@ -12,8 +12,10 @@ public class Constants {
     public static String VIDEO_THUMBNAIL = "http://img.youtube.com/vi/";
 
     public static String YOUTUBE_VIDEO_API_KEY = "AIzaSyD1cHQhUrl3VGAWN2CZCjmkXYlfLiGD6ts";
+
     public static String TITTLE = "https://www.googleapis" +
         ".com/youtube/v3/videos?part=id%2Csnippet&id=bUZfER6-dLA&key=AIzaSyD1cHQhUrl3VGAWN2CZCjmkXYlfLiGD6ts";
+    public static String YOUTUBE_VIDEO_URL = "http://www.youtube.com/watch?v=";
 
     public static String SORT_BY = "sort_by";
 
