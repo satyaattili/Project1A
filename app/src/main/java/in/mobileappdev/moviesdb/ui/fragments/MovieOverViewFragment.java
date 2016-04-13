@@ -137,12 +137,14 @@ public class MovieOverViewFragment extends Fragment {
 
     //generes
     List<Genre> generes = movie.getGenres();
+    mMovieGeneres.removeAllViews();
     for(Genre genre : generes){
       TextView genreString = new TextView(getActivity());
       genreString.setText(genre.getName());
       genreString.setPadding(20,20,20,20);
 //      genreString.setTextAppearance(R.style.GenreText);
       genreString.setBackgroundResource(R.drawable.rounded_bg);
+      genreString.setTextColor(getActivity().getResources().getColor(R.color.md_white_1000));
       LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
           LinearLayout.LayoutParams.WRAP_CONTENT,
           LinearLayout.LayoutParams.WRAP_CONTENT

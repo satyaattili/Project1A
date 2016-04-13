@@ -141,7 +141,7 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
       @Override
       public void onClick(View v) {
         hideErrorLayout();
-        //mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
+        getMore(1);
       }
     });
 
@@ -173,8 +173,6 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
     }
 
   }
-
-
 
   @Override
   public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
@@ -244,19 +242,22 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     hideErrorLayout();
-    clearDataSet();
+
     int id = item.getItemId();
     if (id == R.id.action_popular) {
+      clearDataSet();
       MovieDBApplication.getInstance().savePreference(Constants.PREF_KEY_SELECTED_CATEGORY,
           Constants.PREF_POPULAR_MOVIE);
       mApiService.getPopularLatestMovies(1,Constants.API_KEY).enqueue(this);
       mTitle = getString(R.string.filter_popular);
     }else if(id==R.id.action_toprated){
+      clearDataSet();
       MovieDBApplication.getInstance().savePreference(Constants.PREF_KEY_SELECTED_CATEGORY,
           Constants.PREF_TOP_RATED_MOVIE);
       mApiService.getTopRatedtMovies(1,Constants.API_KEY).enqueue(this);
       mTitle = getString(R.string.filter_toprated);
     }
+    mMovieAdapter.notifyDataSetChanged();
     //mActionBar.setTitle(mTitle);
     return super.onOptionsItemSelected(item);
   }
@@ -268,9 +269,6 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
   @Override
   public void onAttach(Activity activity) {
     super.onAttach(activity);
-
-    // This makes sure that the container activity has implemented
-    // the callback interface. If not, it throws an exception.
     try {
       mOnMovieSelectedListener = (OnMovieSelectedListener) activity;
     } catch (ClassCastException e) {

@@ -5,9 +5,9 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,14 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.squareup.otto.Bus;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.db.DatabaseHandler;
@@ -33,7 +28,6 @@ import in.mobileappdev.moviesdb.models.VideosResponse;
 import in.mobileappdev.moviesdb.rest.MovieDBApiHelper;
 import in.mobileappdev.moviesdb.utils.BusProvider;
 import in.mobileappdev.moviesdb.utils.Constants;
-import in.mobileappdev.moviesdb.utils.Utils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -42,6 +36,7 @@ public class MovieDetailsFragment extends Fragment {
 
   private static final String ARG_PARAM1 = "mid";
   private static final String ARG_PARAM2 = "mname";
+  private static final String TAG = MovieDetailsFragment.class.getSimpleName();
   private ViewPager viewPager;
   private TabLayout tabLayout;
   private ViewPagerAdapter adapter;
@@ -86,18 +81,16 @@ public class MovieDetailsFragment extends Fragment {
     mProgressLoading = (ProgressBar) view.findViewById(R.id.overview_loading) ;
     viewPager = (ViewPager) view.findViewById(R.id.viewpager);
     viewPager.setOffscreenPageLimit(3);
-
-    //setupViewPager(viewPager, mMovieId);
+    setupViewPager(viewPager, mMovieId);
 
     tabLayout = (TabLayout) view.findViewById(R.id.tabs);
-
 
   }
 
   public void updateArticleView(long position) {
-      mMovieId = position;
-      MovieDBApiHelper.getApiService(getActivity()).getMovieReviews(mMovieId, Constants.API_KEY);
-      setupViewPager(viewPager, position);
+    mMovieId = position;
+    adapter.clearFragments();
+    setupViewPager(viewPager, position);
     if(adapter != null){
       adapter.notifyDataSetChanged();
     }
@@ -131,6 +124,11 @@ public class MovieDetailsFragment extends Fragment {
     public void addFragment(Fragment fragment, String title) {
       mFragmentList.add(fragment);
       mFragmentTitleList.add(title);
+    }
+
+    public void clearFragments(){
+      mFragmentList.clear();
+      mFragmentTitleList.clear();
     }
 
     @Override
@@ -213,7 +211,9 @@ public class MovieDetailsFragment extends Fragment {
   Callback<MovieDetailsResponse> overViewResponseCallback = new Callback<MovieDetailsResponse>() {
     @Override
     public void onResponse(Call<MovieDetailsResponse> call, Response<MovieDetailsResponse> response) {
+      adapter.clearFragments();
       if( response.body()!=null){
+        Log.d(TAG, ""+response.body().getTitle());
         adapter.addFragment(MovieOverViewFragment.newInstance(mMovieId), "Overview");
         adapter.notifyDataSetChanged();
         MovieDBApiHelper.getApiService(getActivity()).getCredits(mMovieId,Constants.API_KEY).enqueue
@@ -222,9 +222,10 @@ public class MovieDetailsFragment extends Fragment {
             trailerResponseCallback);
         MovieDBApiHelper.getApiService(getActivity()).getMovieReviews(mMovieId, Constants.API_KEY).enqueue
             (reviewResponseCallback);
-        BusProvider.getInstance().post(response.body());
         mProgressLoading.setVisibility(View.GONE);
+        BusProvider.getInstance().post(response.body());
         tabLayout.setupWithViewPager(viewPager);
+
       }
     }
 
@@ -250,14 +251,13 @@ public class MovieDetailsFragment extends Fragment {
     }
   };
 
-
   /*Callback<Type> retrofitCallBAck = new Callback<Type>() {
     @Override
     public void onResponse(Call<Type> call, Response<Type> response) {
 
       if(response != null && response.body() instanceof Credits)
 
-      if( response.body()!=null && response.body().getCast().size()>0){
+      if( response.body()!=null && ((Credits)response.body()).getCast().size()>0){
         adapter.addFragment(MovieCastAndCrewFragment.newInstance(mMovieId), "CAST");
         adapter.notifyDataSetChanged();
         BusProvider.getInstance().post(response.body());

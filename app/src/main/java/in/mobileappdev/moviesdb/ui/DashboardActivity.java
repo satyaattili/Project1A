@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.ui.fragments.MovieDetailsFragment;
 import in.mobileappdev.moviesdb.ui.fragments.MovieListFragment;
@@ -20,17 +22,15 @@ public class DashboardActivity extends AppCompatActivity implements
     MovieListFragment.OnMovieSelectedListener{
 
   private MovieDetailsFragment articleFrag;
-
+  @Bind(R.id.toolbar) Toolbar mToolBar;
+  long mMovieSelected = -1;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_dashboard);
+    ButterKnife.bind(this);
 
-    //binding = DataBindingUtil.setContentView(this, R.layout.activity_dashboard);
-    //binding.toolbar.setTitle("");
-
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
+    setSupportActionBar(mToolBar);
 
     if (findViewById(R.id.fragment_container) != null) {
       if (savedInstanceState != null) {
@@ -63,7 +63,11 @@ public class DashboardActivity extends AppCompatActivity implements
     }*/
 
     if (articleFrag != null) {
-        articleFrag.updateArticleView(mid);
+        if(mMovieSelected != mid){
+          mMovieSelected = mid;
+          articleFrag.updateArticleView(mid);
+          mToolBar.setTitle(movieName);
+        }
     } else {
         Intent detailsActivity = new Intent(DashboardActivity.this, MovieDetailViewActivity.class);
         detailsActivity.putExtra("movie_id", mid);
