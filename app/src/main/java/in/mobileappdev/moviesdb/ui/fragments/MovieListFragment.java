@@ -1,9 +1,9 @@
 package in.mobileappdev.moviesdb.ui.fragments;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,7 +18,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -32,48 +31,60 @@ import in.mobileappdev.moviesdb.models.Result;
 import in.mobileappdev.moviesdb.rest.MovieDBApiHelper;
 import in.mobileappdev.moviesdb.services.CallMoviesAPI;
 import in.mobileappdev.moviesdb.utils.Constants;
-import in.mobileappdev.moviesdb.views.EndlessRecyclerViewScrollListener;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MovieListFragment extends Fragment implements Callback<MovieResponse> {
 
-  private static final String TAG = MovieListFragment.class.getSimpleName() ;
+  private static final String TAG = MovieListFragment.class.getSimpleName();
+  private static final String ARG_PARAM1 = "cid";
+  @Bind(R.id.progressBar)
+  ProgressBar mProgressBar;
+  @Bind(R.id.error_layout)
+  LinearLayout mErrorLayout;
+  @Bind(R.id.btn_retry)
+  Button mRetryButton;
+  @Bind(R.id.error_message)
+  TextView mErrorMessage;
+  @Bind(R.id.movie_list)
+  RecyclerView mMovieRecyclerView;
+  int pastVisiblesItems, visibleItemCount, totalItemCount;
+  int cid = 1;
   private ArrayList<Result> movies = new ArrayList<>();
   private MovieGridAdapter mMovieAdapter;
   private CallMoviesAPI mApiService;
   private String mTitle;
-  @Bind(R.id.progressBar) ProgressBar mProgressBar;
-  @Bind(R.id.error_layout) LinearLayout mErrorLayout;
-  @Bind(R.id.btn_retry) Button mRetryButton;
-  @Bind(R.id.error_message) TextView mErrorMessage;
-  @Bind(R.id.movie_list) RecyclerView mMovieRecyclerView;
-  @Bind(R.id.swipe_refresh_layout) SwipeRefreshLayout mSwipeRefreshLayout;
   private OnMovieSelectedListener mOnMovieSelectedListener;
   private int currentPage;
   private boolean loading = true;
-  int pastVisiblesItems, visibleItemCount, totalItemCount;
-
-  public static MovieListFragment newInstance() {
-    return new MovieListFragment();
-  }
 
   public MovieListFragment() {
     // Required empty public constructor
   }
 
+  public static MovieListFragment newInstance(int cid) {
+    MovieListFragment fragment = new MovieListFragment();
+    Bundle args = new Bundle();
+    args.putInt(ARG_PARAM1, cid);
+    fragment.setArguments(args);
+    return fragment;
+  }
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setHasOptionsMenu(true);
+    //setHasOptionsMenu(true);
+    if (getArguments() != null) {
+      cid = getArguments().getInt(ARG_PARAM1);
+    }
     mApiService = MovieDBApiHelper.getApiService(getActivity());
   }
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
-    View view =  inflater.inflate(R.layout.fragment_movie_list, container, false);
+    View view = inflater.inflate(R.layout.fragment_movie_list, container, false);
     ButterKnife.bind(this, view);
     initviews();
     return view;
@@ -87,7 +98,7 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
   private void initviews() {
 
     mMovieRecyclerView.setHasFixedSize(true);
-    final GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(),2);
+    final GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
     mMovieRecyclerView.setLayoutManager(gridLayoutManager);
 
     //animation
@@ -108,13 +119,12 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
           pastVisiblesItems = gridLayoutManager.findFirstVisibleItemPosition();
 
           if (loading) {
-            mSwipeRefreshLayout.setRefreshing(true);
             if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
               loading = false;
               Log.v("...", "Last Item Wow !");
               getMore(currentPage + 1);
-              Toast.makeText(getActivity(), movies.size() + " Movies found", Toast.LENGTH_SHORT)
-                  .show();
+             /* Toast.makeText(getActivity(), movies.size() + " Movies found", Toast.LENGTH_SHORT)
+                  .show();*/
             }
           }
         }
@@ -132,40 +142,44 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
     mMovieRecyclerView.setAdapter(mMovieAdapter);
     mProgressBar.setVisibility(View.VISIBLE);
 
-    mApiService.getPopularLatestMovies(1,Constants.API_KEY).enqueue(this);
-    MovieDBApplication.getInstance().savePreference(Constants.PREF_KEY_SELECTED_CATEGORY,
-        Constants.PREF_POPULAR_MOVIE);
+    switch (cid) {
+      case 1:
+        mApiService.getPopularLatestMovies(1, Constants.API_KEY).enqueue(this);
+        MovieDBApplication.getInstance().savePreference(Constants.PREF_KEY_SELECTED_CATEGORY,
+            Constants.PREF_POPULAR_MOVIE);
+        break;
+
+      case 2:
+        mApiService.getTopRatedtMovies(1, Constants.API_KEY).enqueue(this);
+        MovieDBApplication.getInstance().savePreference(Constants.PREF_KEY_SELECTED_CATEGORY,
+            Constants.PREF_TOP_RATED_MOVIE);
+        break;
+    }
+
+
     mTitle = getString(R.string.filter_popular);
 
     mRetryButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         hideErrorLayout();
-        //mApiService.getPopularLatestMovies(Constants.API_KEY).enqueue(this);
-      }
-    });
-
-    mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-      @Override
-      public void onRefresh() {
         getMore(1);
       }
     });
+
   }
 
   private void getMore(int page) {
-
-    mSwipeRefreshLayout.setRefreshing(true);
-
-    switch (MovieDBApplication.getInstance().getIntPreference(Constants.PREF_KEY_SELECTED_CATEGORY)){
+    switch (MovieDBApplication.getInstance()
+        .getIntPreference(Constants.PREF_KEY_SELECTED_CATEGORY)) {
       case 0:
-        mApiService.getPopularLatestMovies(page,Constants.API_KEY).enqueue(this);
+        mApiService.getPopularLatestMovies(page, Constants.API_KEY).enqueue(this);
         MovieDBApplication.getInstance().savePreference(Constants.PREF_KEY_SELECTED_CATEGORY,
             Constants.PREF_POPULAR_MOVIE);
         break;
 
       case 1:
-        mApiService.getTopRatedtMovies(page,Constants.API_KEY).enqueue(this);
+        mApiService.getTopRatedtMovies(page, Constants.API_KEY).enqueue(this);
         MovieDBApplication.getInstance().savePreference(Constants.PREF_KEY_SELECTED_CATEGORY,
             Constants.PREF_TOP_RATED_MOVIE);
         break;
@@ -174,34 +188,31 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
 
   }
 
-
-
   @Override
   public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
-    mSwipeRefreshLayout.setRefreshing(false);
 
-    if(response.body() != null){
+    if (response.body() != null) {
       movies.addAll(response.body().getResults());
       currentPage = response.body().getPage();
       int total = response.body().getTotalPages();
-      Log.e(TAG, "++++++++ CURRENT PAGE : "+currentPage+" TOTAL PAGES : "+total);
+      Log.e(TAG, "++++++++ CURRENT PAGE : " + currentPage + " TOTAL PAGES : " + total);
       /*if(currentPage<total){
         loading = true;
       }*/
-      Log.e(TAG, "Current Page : "+currentPage+"SIze of the movies recieved : "+movies.size());
+      Log.e(TAG,
+          "Current Page : " + currentPage + "SIze of the movies recieved : " + movies.size());
       hideErrorLayout();
       mMovieAdapter.notifyDataSetChanged();
     }
     mProgressBar.setVisibility(View.GONE);
-    if(movies.size()==0){
+    if (movies.size() == 0) {
       showErrorLayout();
     }
   }
 
   @Override
   public void onFailure(Call<MovieResponse> call, Throwable t) {
-    mSwipeRefreshLayout.setRefreshing(false);
-    if(movies.size()==0){
+    if (movies.size() == 0) {
       showErrorLayout();
     }
 
@@ -210,7 +221,7 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
   /**
    * Showing error layout
    */
-  private void showErrorLayout(){
+  private void showErrorLayout() {
     mMovieRecyclerView.setVisibility(View.GONE);
     mProgressBar.setVisibility(View.GONE);
     mErrorLayout.setVisibility(View.VISIBLE);
@@ -219,7 +230,7 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
   /**
    * Hiding error layout
    */
-  private void hideErrorLayout(){
+  private void hideErrorLayout() {
     mMovieRecyclerView.setVisibility(View.VISIBLE);
     mProgressBar.setVisibility(View.VISIBLE);
     mErrorLayout.setVisibility(View.GONE);
@@ -229,7 +240,7 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
   /**
    * Clearing data set
    */
-  private void clearDataSet(){
+  private void clearDataSet() {
     movies.clear();
     mMovieAdapter.notifyDataSetChanged();
   }
@@ -244,38 +255,49 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     hideErrorLayout();
-    clearDataSet();
+
     int id = item.getItemId();
     if (id == R.id.action_popular) {
+      clearDataSet();
       MovieDBApplication.getInstance().savePreference(Constants.PREF_KEY_SELECTED_CATEGORY,
           Constants.PREF_POPULAR_MOVIE);
-      mApiService.getPopularLatestMovies(1,Constants.API_KEY).enqueue(this);
+      mApiService.getPopularLatestMovies(1, Constants.API_KEY).enqueue(this);
       mTitle = getString(R.string.filter_popular);
-    }else if(id==R.id.action_toprated){
+    } else if (id == R.id.action_toprated) {
+      clearDataSet();
       MovieDBApplication.getInstance().savePreference(Constants.PREF_KEY_SELECTED_CATEGORY,
           Constants.PREF_TOP_RATED_MOVIE);
-      mApiService.getTopRatedtMovies(1,Constants.API_KEY).enqueue(this);
+      mApiService.getTopRatedtMovies(1, Constants.API_KEY).enqueue(this);
       mTitle = getString(R.string.filter_toprated);
     }
+    mMovieAdapter.notifyDataSetChanged();
     //mActionBar.setTitle(mTitle);
     return super.onOptionsItemSelected(item);
-  }
-
-  public interface OnMovieSelectedListener {
-    public void onMovieSelected(long mId ,String mName);
   }
 
   @Override
   public void onAttach(Activity activity) {
     super.onAttach(activity);
-
-    // This makes sure that the container activity has implemented
-    // the callback interface. If not, it throws an exception.
     try {
       mOnMovieSelectedListener = (OnMovieSelectedListener) activity;
     } catch (ClassCastException e) {
       throw new ClassCastException(activity.toString()
           + " must implement OnHeadlineSelectedListener");
     }
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+      mMovieRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+    } else {
+      mMovieRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 4));
+    }
+  }
+
+
+  public interface OnMovieSelectedListener {
+    public void onMovieSelected(long mId, String mName);
   }
 }

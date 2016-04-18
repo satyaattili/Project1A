@@ -4,9 +4,8 @@ package in.mobileappdev.moviesdb.ui.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,14 +22,14 @@ import in.mobileappdev.moviesdb.services.CallMoviesAPI;
 import in.mobileappdev.moviesdb.utils.BusProvider;
 
 
-
 public class MovieTrailersFragment extends Fragment {
 
   private static final String ARG_PARAM1 = "movieID";
   private static final String TAG = MovieTrailersFragment.class.getSimpleName();
+  @Bind(R.id.recycler_view)
+  RecyclerView mRecyclerView;
   private long mMovieId;
   private CallMoviesAPI service;
-  @Bind(R.id.recycler_view) RecyclerView mRecyclerView;
 
 
   public MovieTrailersFragment() {
@@ -70,7 +69,7 @@ public class MovieTrailersFragment extends Fragment {
                            Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.fragment_movie_trailers, container, false);
     ButterKnife.bind(this, view);
-    mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
     return view;
   }
 
@@ -88,7 +87,6 @@ public class MovieTrailersFragment extends Fragment {
       }
     });
   }
-
 
 
   @Subscribe

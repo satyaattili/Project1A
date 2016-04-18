@@ -17,4 +17,10 @@
     <string name="runtime">Runtime</string>
     <string name="vote_average">Vote Average</string>
     <string name="imdb_id">IMDB id</string>
+    <string name="deleted_from_fav">Deleted from Favourites</string>
+    <string name="added_to_fav">Added to your Favourites</string>
+    <string name="reviews">Reviews</string>
+    <string name="trailers">Trailers</string>
+    <string name="cast">CAST</string>
+    <string name="overview">Overview</string>
 </resources>
