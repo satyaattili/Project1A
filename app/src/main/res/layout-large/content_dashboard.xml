@@ -25,7 +25,7 @@ limitations under the License.
               tools:context=".ui.DashboardActivity"
               tools:showIn="@layout/activity_dashboard">
 
-    <fragment android:name="in.mobileappdev.moviesdb.ui.fragments.MovieListFragment"
+    <fragment android:name="in.mobileappdev.moviesdb.ui.fragments.DashboardFragment"
               android:id="@+id/headlines_fragment"
               android:layout_weight="1"
               android:layout_width="0dp"

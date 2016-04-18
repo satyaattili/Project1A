@@ -10,6 +10,7 @@ import android.view.View;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import in.mobileappdev.moviesdb.R;
+import in.mobileappdev.moviesdb.ui.fragments.DashboardFragment;
 import in.mobileappdev.moviesdb.ui.fragments.MovieDetailsFragment;
 import in.mobileappdev.moviesdb.ui.fragments.MovieListFragment;
 import in.mobileappdev.moviesdb.utils.Utils;
@@ -37,7 +38,7 @@ public class DashboardActivity extends AppCompatActivity implements
         return;
       }
 
-      MovieListFragment listFragment = MovieListFragment.newInstance();
+      DashboardFragment listFragment = DashboardFragment.newInstance();
       listFragment.setArguments(getIntent().getExtras());
 
       getSupportFragmentManager().beginTransaction()

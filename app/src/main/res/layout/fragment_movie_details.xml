@@ -16,9 +16,10 @@
         app:layout_anchor="@+id/appbar"
         app:layout_anchorGravity="bottom"
         android:background="@color/colorPrimary"
-        app:tabGravity="fill"
+        app:tabGravity="center"
+        app:tabMode="scrollable"
         style="@style/MovieTabLayout"
-        app:tabContentStart="72dp" />
+        app:tabContentStart="2dp" />
 
     <RelativeLayout
         android:layout_width="match_parent"

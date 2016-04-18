@@ -15,10 +15,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.db.DatabaseHandler;
 import in.mobileappdev.moviesdb.models.Credits;
@@ -37,12 +40,104 @@ public class MovieDetailsFragment extends Fragment {
   private static final String ARG_PARAM1 = "mid";
   private static final String ARG_PARAM2 = "mname";
   private static final String TAG = MovieDetailsFragment.class.getSimpleName();
-  private ViewPager viewPager;
-  private TabLayout tabLayout;
+  @Bind(R.id.overview_loading)
+  ProgressBar mProgressLoading;
+  @Bind(R.id.viewpager)
+  ViewPager viewPager;
+  @Bind(R.id.tabs)
+  TabLayout tabLayout;
   private ViewPagerAdapter adapter;
   private long mMovieId;
+  Callback<ReviewResponse> reviewResponseCallback = new Callback<ReviewResponse>() {
+    @Override
+    public void onResponse(Call<ReviewResponse> call, Response<ReviewResponse> response) {
+      if(isAdded()){
+        if (response.body() != null && response.body().getResults().size() > 0) {
+          adapter.addFragment(MovieReviewsFragment.newInstance(mMovieId),
+              getString(R.string.reviews));
+          adapter.notifyDataSetChanged();
+          BusProvider.getInstance().post(response.body());
+        }
+      }
+
+    }
+
+    @Override
+    public void onFailure(Call<ReviewResponse> call, Throwable t) {
+
+    }
+  };
+  Callback<VideosResponse> trailerResponseCallback = new Callback<VideosResponse>() {
+    @Override
+    public void onResponse(Call<VideosResponse> call, Response<VideosResponse> response) {
+      if (response.body() != null && response.body().getResults().size() > 0 && isAdded()) {
+        adapter.addFragment(MovieTrailersFragment.newInstance(mMovieId),
+            getString(R.string.trailers));
+        adapter.notifyDataSetChanged();
+        BusProvider.getInstance().post(response.body());
+      }
+    }
+
+    @Override
+    public void onFailure(Call<VideosResponse> call, Throwable t) {
+
+    }
+  };
+  Callback<Credits> creditsCallback = new Callback<Credits>() {
+    @Override
+    public void onResponse(Call<Credits> call, Response<Credits> response) {
+      if (response.body() != null && response.body().getCast().size() > 0 && isAdded()) {
+        adapter.addFragment(MovieCastAndCrewFragment.newInstance(mMovieId),
+            getString(R.string.cast));
+        adapter.notifyDataSetChanged();
+        BusProvider.getInstance().post(response.body());
+      }
+    }
+
+    @Override
+    public void onFailure(Call<Credits> call, Throwable t) {
+
+    }
+  };
+  Callback<MovieDetailsResponse> overViewResponseCallback = new Callback<MovieDetailsResponse>() {
+    @Override
+    public void onResponse(Call<MovieDetailsResponse> call,
+                           Response<MovieDetailsResponse> response) {
+      adapter.clearFragments();
+      if (response.body() != null && isAdded()) {
+        Log.d(TAG, "" + response.body().getTitle());
+        adapter.addFragment(MovieOverViewFragment.newInstance(mMovieId),
+            getString(R.string.overview));
+        adapter.notifyDataSetChanged();
+        MovieDBApiHelper.getApiService(getActivity())
+            .getCredits(mMovieId, Constants.API_KEY)
+            .enqueue
+                (creditsCallback);
+        MovieDBApiHelper.getApiService(getActivity())
+            .getMovieTrailers(mMovieId, Constants.API_KEY)
+            .enqueue(
+                trailerResponseCallback);
+        MovieDBApiHelper.getApiService(getActivity())
+            .getMovieReviews(mMovieId, Constants.API_KEY)
+            .enqueue
+                (reviewResponseCallback);
+        mProgressLoading.setVisibility(View.GONE);
+        BusProvider.getInstance().post(response.body());
+        tabLayout.setupWithViewPager(viewPager);
+
+      }
+    }
+
+    @Override
+    public void onFailure(Call<MovieDetailsResponse> call, Throwable t) {
+
+    }
+  };
   private String mMovieName;
-  private ProgressBar mProgressLoading;
+
+  public MovieDetailsFragment() {
+    // Required empty public constructor
+  }
 
   public static MovieDetailsFragment newInstance(long mid, String mname) {
     MovieDetailsFragment fragment = new MovieDetailsFragment();
@@ -51,10 +146,6 @@ public class MovieDetailsFragment extends Fragment {
     args.putString(ARG_PARAM2, mname);
     fragment.setArguments(args);
     return fragment;
-  }
-
-  public MovieDetailsFragment() {
-    // Required empty public constructor
   }
 
   @Override
@@ -67,23 +158,20 @@ public class MovieDetailsFragment extends Fragment {
     }
   }
 
-
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
-    View view =  inflater.inflate(R.layout.fragment_movie_details, container, false);
+    View view = inflater.inflate(R.layout.fragment_movie_details, container, false);
+    ButterKnife.bind(this, view);
     initViews(view);
     getActivity().invalidateOptionsMenu();
     return view;
   }
 
   private void initViews(View view) {
-    mProgressLoading = (ProgressBar) view.findViewById(R.id.overview_loading) ;
-    viewPager = (ViewPager) view.findViewById(R.id.viewpager);
     viewPager.setOffscreenPageLimit(3);
     setupViewPager(viewPager, mMovieId);
-
-    tabLayout = (TabLayout) view.findViewById(R.id.tabs);
+    tabLayout.setSmoothScrollingEnabled(true);
 
   }
 
@@ -91,7 +179,7 @@ public class MovieDetailsFragment extends Fragment {
     mMovieId = position;
     adapter.clearFragments();
     setupViewPager(viewPager, position);
-    if(adapter != null){
+    if (adapter != null) {
       adapter.notifyDataSetChanged();
     }
   }
@@ -101,6 +189,74 @@ public class MovieDetailsFragment extends Fragment {
         (overViewResponseCallback);
     adapter = new ViewPagerAdapter(getChildFragmentManager());
     viewPager.setAdapter(adapter);
+  }
+
+  @Override
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    getActivity().getMenuInflater().inflate(R.menu.menu_movie_details, menu);
+    super.onCreateOptionsMenu(menu, inflater);
+  }
+
+  @Override
+  public void onPrepareOptionsMenu(Menu menu) {
+    if (DatabaseHandler.getInstance(getActivity()).isExistsInFavorites(mMovieId)) {
+      menu.findItem(R.id.action_favorite).setChecked(true);
+      menu.findItem(R.id.action_favorite).setIcon(R.drawable.ic_action_favorite);
+    }
+    super.onPrepareOptionsMenu(menu);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    int id = item.getItemId();
+    if (id == R.id.action_favorite) {
+      if (item.isChecked()) {
+        item.setChecked(false);
+        item.setIcon(R.drawable.ic_action_favorite_outline);
+        DatabaseHandler.getInstance(getActivity()).deleteContact(mMovieId);
+        Snackbar.make(getView(), R.string.deleted_from_fav, Snackbar.LENGTH_SHORT).show();
+      } else {
+        item.setChecked(true);
+        item.setIcon(R.drawable.ic_action_favorite);
+        DatabaseHandler.getInstance(getActivity()).addToFavorites(mMovieId);
+        Snackbar.make(getView(), R.string.added_to_fav, Snackbar.LENGTH_SHORT).show();
+      }
+    } else if (id == android.R.id.home) {
+      getActivity().onBackPressed();
+    }
+    return true;
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    BusProvider.getInstance().register(this);
+  }
+
+  /*Callback<Type> retrofitCallBAck = new Callback<Type>() {
+    @Override
+    public void onResponse(Call<Type> call, Response<Type> response) {
+
+      if(response != null && response.body() instanceof Credits)
+
+      if( response.body()!=null && ((Credits)response.body()).getCast().size()>0){
+        adapter.addFragment(MovieCastAndCrewFragment.newInstance(mMovieId), "CAST");
+        adapter.notifyDataSetChanged();
+        BusProvider.getInstance().post(response.body());
+      }
+    }
+
+    @Override
+    public void onFailure(Call<Type> call, Throwable t) {
+
+    }
+  };
+*/
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    BusProvider.getInstance().unregister(this);
   }
 
   class ViewPagerAdapter extends FragmentStatePagerAdapter {
@@ -126,7 +282,7 @@ public class MovieDetailsFragment extends Fragment {
       mFragmentTitleList.add(title);
     }
 
-    public void clearFragments(){
+    public void clearFragments() {
       mFragmentList.clear();
       mFragmentTitleList.clear();
     }
@@ -139,150 +295,10 @@ public class MovieDetailsFragment extends Fragment {
 
 
   @Override
-  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-    getActivity().getMenuInflater().inflate(R.menu.menu_movie_details, menu);
-    super.onCreateOptionsMenu(menu, inflater);
+  public void setUserVisibleHint(boolean isVisibleToUser) {
+    super.setUserVisibleHint(isVisibleToUser);
+    Log.e(TAG,"setUserVisibleHint");
+
+    Toast.makeText(getActivity(), "Shoe visible hint", Toast.LENGTH_SHORT).show();
   }
-
-  @Override
-  public void onPrepareOptionsMenu(Menu menu) {
-    if(DatabaseHandler.getInstance(getActivity()).isExistsInFavorites(mMovieId)){
-      menu.findItem(R.id.action_favorite).setChecked(true);
-      menu.findItem(R.id.action_favorite).setIcon(R.drawable.ic_action_favorite);
-    }
-    super.onPrepareOptionsMenu(menu);
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    int id = item.getItemId();
-    if (id == R.id.action_favorite) {
-      if(item.isChecked()){
-        item.setChecked(false);
-        item.setIcon(R.drawable.ic_action_favorite_outline);
-        DatabaseHandler.getInstance(getActivity()).deleteContact(mMovieId);
-        Snackbar.make(getView(), "Deleted from Favourites", Snackbar.LENGTH_SHORT).show();
-      }else{
-        item.setChecked(true);
-        item.setIcon(R.drawable.ic_action_favorite);
-        DatabaseHandler.getInstance(getActivity()).addToFavorites(mMovieId);
-        Snackbar.make(getView(), "Added to your Favourites", Snackbar.LENGTH_SHORT).show();
-      }
-    }else if(id==R.id.home){
-      getActivity().onBackPressed();
-    }
-    return true;
-  }
-
-
-  Callback<ReviewResponse> reviewResponseCallback = new Callback<ReviewResponse>() {
-    @Override
-    public void onResponse(Call<ReviewResponse> call, Response<ReviewResponse> response) {
-      if( response.body()!=null && response.body().getResults().size()>0){
-        adapter.addFragment(MovieReviewsFragment.newInstance(mMovieId), "Reviews");
-        adapter.notifyDataSetChanged();
-        BusProvider.getInstance().post(response.body());
-      }
-    }
-
-    @Override
-    public void onFailure(Call<ReviewResponse> call, Throwable t) {
-
-    }
-  };
-
-  Callback<VideosResponse> trailerResponseCallback = new Callback<VideosResponse>() {
-    @Override
-    public void onResponse(Call<VideosResponse> call, Response<VideosResponse> response) {
-      if(response.body()!=null && response.body().getResults().size()>0){
-        adapter.addFragment(MovieTrailersFragment.newInstance(mMovieId), "Trailers");
-        adapter.notifyDataSetChanged();
-        BusProvider.getInstance().post(response.body());
-      }
-    }
-
-    @Override
-    public void onFailure(Call<VideosResponse> call, Throwable t) {
-
-    }
-  };
-
-
-  Callback<MovieDetailsResponse> overViewResponseCallback = new Callback<MovieDetailsResponse>() {
-    @Override
-    public void onResponse(Call<MovieDetailsResponse> call, Response<MovieDetailsResponse> response) {
-      adapter.clearFragments();
-      if( response.body()!=null){
-        Log.d(TAG, ""+response.body().getTitle());
-        adapter.addFragment(MovieOverViewFragment.newInstance(mMovieId), "Overview");
-        adapter.notifyDataSetChanged();
-        MovieDBApiHelper.getApiService(getActivity()).getCredits(mMovieId,Constants.API_KEY).enqueue
-            (creditsCallback);
-        MovieDBApiHelper.getApiService(getActivity()).getMovieTrailers(mMovieId, Constants.API_KEY).enqueue(
-            trailerResponseCallback);
-        MovieDBApiHelper.getApiService(getActivity()).getMovieReviews(mMovieId, Constants.API_KEY).enqueue
-            (reviewResponseCallback);
-        mProgressLoading.setVisibility(View.GONE);
-        BusProvider.getInstance().post(response.body());
-        tabLayout.setupWithViewPager(viewPager);
-
-      }
-    }
-
-    @Override
-    public void onFailure(Call<MovieDetailsResponse> call, Throwable t) {
-
-    }
-  };
-
-  Callback<Credits> creditsCallback = new Callback<Credits>() {
-    @Override
-    public void onResponse(Call<Credits> call, Response<Credits> response) {
-      if( response.body()!=null && response.body().getCast().size()>0){
-        adapter.addFragment(MovieCastAndCrewFragment.newInstance(mMovieId), "CAST");
-        adapter.notifyDataSetChanged();
-        BusProvider.getInstance().post(response.body());
-      }
-    }
-
-    @Override
-    public void onFailure(Call<Credits> call, Throwable t) {
-
-    }
-  };
-
-  /*Callback<Type> retrofitCallBAck = new Callback<Type>() {
-    @Override
-    public void onResponse(Call<Type> call, Response<Type> response) {
-
-      if(response != null && response.body() instanceof Credits)
-
-      if( response.body()!=null && ((Credits)response.body()).getCast().size()>0){
-        adapter.addFragment(MovieCastAndCrewFragment.newInstance(mMovieId), "CAST");
-        adapter.notifyDataSetChanged();
-        BusProvider.getInstance().post(response.body());
-      }
-    }
-
-    @Override
-    public void onFailure(Call<Type> call, Throwable t) {
-
-    }
-  };
-*/
-
-
-  @Override
-  public void onStart() {
-    super.onStart();
-    BusProvider.getInstance().register(this);
-  }
-
-  @Override
-  public void onStop() {
-    super.onStop();
-    BusProvider.getInstance().unregister(this);
-  }
-
-
 }

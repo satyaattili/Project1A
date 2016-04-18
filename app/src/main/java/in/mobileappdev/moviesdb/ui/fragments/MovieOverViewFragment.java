@@ -34,22 +34,35 @@ import in.mobileappdev.moviesdb.views.CircleImageView;
 public class MovieOverViewFragment extends Fragment {
 
   private static final String ARG_PARAM1 = "movieID";
-  private long mMovieId;
   private static final String TAG = MovieOverViewFragment.class.getSimpleName();
+  @Bind(R.id.movie_thumbnail)
+  CircleImageView mThumbnailImage;
+  @Bind(R.id.progressBar)
+  ProgressBar mLoading;
+  @Bind(R.id.movie_content)
+  NestedScrollView mMovieContent;
+  @Bind(R.id.movie_overview)
+  TextView mOverView;
+  @Bind(R.id.tag_line)
+  TextView mTagline;
+  @Bind(R.id.generes_parent)
+  LinearLayout mMovieGeneres;
+  @Bind(R.id.card_tag_line)
+  CardView mTaglineCard;
+  @Bind(R.id.lb1)
+  TextView leftButton1;
+  @Bind(R.id.lb2)
+  TextView leftButton2;
+  @Bind(R.id.rb1)
+  TextView rightButton1;
+  @Bind(R.id.rb2)
+  TextView rightButton2;
+  @Bind(R.id.vote_avg_card)
+  CardView votingCard;
+  @Bind(R.id.generesTextViews)
+  TextView generesTextView;
+  private long mMovieId;
   private CallMoviesAPI service;
-  @Bind(R.id.movie_thumbnail) CircleImageView mThumbnailImage;
-  @Bind(R.id.progressBar) ProgressBar mLoading;
-  @Bind(R.id.movie_content) NestedScrollView mMovieContent;
-  @Bind(R.id.movie_overview) TextView mOverView;
-  @Bind(R.id.tag_line) TextView mTagline;
-  @Bind(R.id.generes_parent) LinearLayout mMovieGeneres;
-
-  @Bind(R.id.lb1) TextView leftButton1;
-  @Bind(R.id.lb2) TextView leftButton2;
-  @Bind(R.id.rb1) TextView rightButton1;
-  @Bind(R.id.rb2) TextView rightButton2;
-
-  @Bind(R.id.vote_avg_card) CardView votingCard;
 
 
   public MovieOverViewFragment() {
@@ -87,23 +100,24 @@ public class MovieOverViewFragment extends Fragment {
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
-    View view =  inflater.inflate(R.layout.fragment_over_view, container, false);
+    View view = inflater.inflate(R.layout.fragment_over_view, container, false);
     ButterKnife.bind(this, view);
     return view;
   }
 
   @Subscribe
-  public void getOverViewResponse(MovieDetailsResponse movieDetails){
+  public void getOverViewResponse(MovieDetailsResponse movieDetails) {
     displayMovieDetails(movieDetails);
   }
 
 
   /**
    * Display Movie Overview
+   *
    * @param movie
    */
   @TargetApi(Build.VERSION_CODES.M)
-  private void displayMovieDetails(MovieDetailsResponse movie){
+  private void displayMovieDetails(MovieDetailsResponse movie) {
 
     mLoading.setVisibility(View.GONE);
     mMovieContent.setVisibility(View.VISIBLE);
@@ -114,46 +128,45 @@ public class MovieOverViewFragment extends Fragment {
     rightButton1.setText(String.valueOf(movie.getVote_average()));
     rightButton2.setText(Utils.getFormattedTime(movie.getRuntime()));
 
-    String imageurl = Constants.IMAGE_BASE_URL+movie.getBackdrop_path();
-    String posterUrl = Constants.IMAGE_BASE_URL+movie.getPoster_path();
+    String imageurl = Constants.IMAGE_BASE_URL + movie.getBackdrop_path();
+    String posterUrl = Constants.IMAGE_BASE_URL + movie.getPoster_path();
     Picasso.with(getActivity()).load(posterUrl)
         .placeholder(R.drawable.default_movie).error(R.drawable.default_movie)
         .into(mThumbnailImage);
-    if(getActivity() != null && getActivity() instanceof MovieDetailViewActivity){
-     ((MovieDetailViewActivity) getActivity()).setMovieToolbar(imageurl,movie.getTitle());
+    if (getActivity() != null && getActivity() instanceof MovieDetailViewActivity) {
+      ((MovieDetailViewActivity) getActivity()).setMovieToolbar(imageurl, movie.getTitle());
     }
 
+
+    if (Utils.isEmpty(movie.getTagline())) {
+      mTagline.setVisibility(View.VISIBLE);
+      mTagline.setText(movie.getTagline());
+    }
     mOverView.setText(movie.getOverview());
-    mTagline.setText(movie.getTagline());
+
     double voting = movie.getVote_average();
-    if(voting<= Constants.AVERAGE){
+    if (voting <= Constants.AVERAGE) {
       votingCard.setCardBackgroundColor(getResources().getColor(R.color.md_red_800));
-    }else if(voting>Constants.AVERAGE && voting<Constants.GOOD){
+    } else if (voting > Constants.AVERAGE && voting < Constants.GOOD) {
       votingCard.setCardBackgroundColor(getResources().getColor(R.color.md_orange_800));
-    }else if(voting>=Constants.GOOD){
+    } else if (voting >= Constants.GOOD) {
       votingCard.setCardBackgroundColor(getResources().getColor(R.color.md_green_800));
     }
 
 
     //generes
     List<Genre> generes = movie.getGenres();
-    mMovieGeneres.removeAllViews();
-    for(Genre genre : generes){
-      TextView genreString = new TextView(getActivity());
-      genreString.setText(genre.getName());
-      genreString.setPadding(20,20,20,20);
-//      genreString.setTextAppearance(R.style.GenreText);
-      genreString.setBackgroundResource(R.drawable.rounded_bg);
-      genreString.setTextColor(getActivity().getResources().getColor(R.color.md_white_1000));
-      LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-          LinearLayout.LayoutParams.WRAP_CONTENT,
-          LinearLayout.LayoutParams.WRAP_CONTENT
-      );
-      params.setMargins(10, 10,10,10);
-      genreString.setLayoutParams(params);
-      mMovieGeneres.addView(genreString);
+    StringBuilder stringBuilder = new StringBuilder();
+    String sep = ", ";
+    for (int i=0;i< generes.size();i++) {
+      stringBuilder.append(generes.get(i).getName());
+      if(i<generes.size()-1){
+        stringBuilder.append(sep);
+      }
 
     }
+
+    generesTextView.setText(stringBuilder.toString());
   }
 
 

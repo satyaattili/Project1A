@@ -7,19 +7,14 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.ImageView;
-import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.adapters.SlideShowPagerAdapter;
-import in.mobileappdev.moviesdb.models.Credits;
 import in.mobileappdev.moviesdb.models.MovieImages;
 import in.mobileappdev.moviesdb.rest.MovieDBApiHelper;
-import in.mobileappdev.moviesdb.ui.fragments.MovieCastAndCrewFragment;
 import in.mobileappdev.moviesdb.ui.fragments.MovieDetailsFragment;
-import in.mobileappdev.moviesdb.utils.BusProvider;
 import in.mobileappdev.moviesdb.utils.Constants;
 import in.mobileappdev.moviesdb.views.AutoScrollViewPager;
 import retrofit2.Call;
@@ -29,10 +24,29 @@ import retrofit2.Response;
 public class MovieDetailViewActivity extends AppCompatActivity {
 
   private static final String TAG = MovieDetailViewActivity.class.getSimpleName();
-  private SlideShowPagerAdapter mSlideShowAdapter;
-  @Bind(R.id.toolbar) Toolbar mToolBar;
-  @Bind(R.id.collapsing_toolbar) CollapsingToolbarLayout mCollapsingToolBarLayout;
-  @Bind(R.id.image_slideshow_pager) AutoScrollViewPager mSlideShowViewPager;
+  @Bind(R.id.toolbar)  Toolbar mToolBar;
+  @Bind(R.id.collapsing_toolbar)  CollapsingToolbarLayout mCollapsingToolBarLayout;
+  @Bind(R.id.image_slideshow_pager)  AutoScrollViewPager mSlideShowViewPager;
+  Callback<MovieImages> imagesCallback = new Callback<MovieImages>() {
+    @Override
+    public void onResponse(Call<MovieImages> call, Response<MovieImages> response) {
+      if (response.body() != null) {
+        SlideShowPagerAdapter mSlideShowAdapter =
+            new SlideShowPagerAdapter(MovieDetailViewActivity.this, response.body
+                ());
+        mSlideShowViewPager.setAdapter(mSlideShowAdapter);
+        mSlideShowViewPager.setAutoScrollDurationFactor(10);
+        mSlideShowViewPager.setInterval(3000);
+        mSlideShowAdapter.notifyDataSetChanged();
+        mSlideShowViewPager.startAutoScroll();
+      }
+    }
+
+    @Override
+    public void onFailure(Call<MovieImages> call, Throwable t) {
+
+    }
+  };
   private long movieId = -1;
 
   @Override
@@ -43,7 +57,7 @@ public class MovieDetailViewActivity extends AppCompatActivity {
 
     setSupportActionBar(mToolBar);
 
-    if(getSupportActionBar() != null){
+    if (getSupportActionBar() != null) {
       getSupportActionBar().setDisplayHomeAsUpEnabled(true);
       mCollapsingToolBarLayout.setTitle("");
     }
@@ -51,7 +65,7 @@ public class MovieDetailViewActivity extends AppCompatActivity {
 
     String movieName = null;
     Intent resultIntent = getIntent();
-    if(resultIntent != null){
+    if (resultIntent != null) {
       movieId = resultIntent.getLongExtra("movie_id", -1);
       movieName = resultIntent.getStringExtra("movie_name");
       mCollapsingToolBarLayout.setTitle(movieName);
@@ -66,68 +80,7 @@ public class MovieDetailViewActivity extends AppCompatActivity {
 
   }
 
-  public void setMovieToolbar(String imageurl, String name){
+  public void setMovieToolbar(String imageurl, String name) {
     mCollapsingToolBarLayout.setTitle(name);
   }
-
-  Callback<MovieImages> imagesCallback = new Callback<MovieImages>() {
-    @Override
-    public void onResponse(Call<MovieImages> call, Response<MovieImages> response) {
-      if( response.body()!=null){
-        mSlideShowAdapter = new SlideShowPagerAdapter(MovieDetailViewActivity.this, response.body
-            ());
-        mSlideShowViewPager.setAdapter(mSlideShowAdapter);
-        mSlideShowViewPager.setAutoScrollDurationFactor(10);
-        mSlideShowViewPager.setInterval(3000);
-       //\ mSlideShowViewPager.setPageTransformer(true, new ZoomOutPageTransformer());
-        mSlideShowAdapter.notifyDataSetChanged();
-        mSlideShowViewPager.startAutoScroll();
-      }
-    }
-
-    @Override
-    public void onFailure(Call<MovieImages> call, Throwable t) {
-
-    }
-  };
-
-  public class ZoomOutPageTransformer implements ViewPager.PageTransformer {
-    private static final float MIN_SCALE = 0.85f;
-    private static final float MIN_ALPHA = 0.5f;
-
-    public void transformPage(View view, float position) {
-      int pageWidth = view.getWidth();
-      int pageHeight = view.getHeight();
-
-      if (position < -1) { // [-Infinity,-1)
-        // This page is way off-screen to the left.
-        view.setAlpha(0);
-
-      } else if (position <= 1) { // [-1,1]
-        // Modify the default slide transition to shrink the page as well
-        float scaleFactor = Math.max(MIN_SCALE, 1 - Math.abs(position));
-        float vertMargin = pageHeight * (1 - scaleFactor) / 2;
-        float horzMargin = pageWidth * (1 - scaleFactor) / 2;
-        if (position < 0) {
-          view.setTranslationX(horzMargin - vertMargin / 2);
-        } else {
-          view.setTranslationX(-horzMargin + vertMargin / 2);
-        }
-
-        // Scale the page down (between MIN_SCALE and 1)
-        view.setScaleX(scaleFactor);
-        view.setScaleY(scaleFactor);
-
-        // Fade the page relative to its size.
-        view.setAlpha(MIN_ALPHA +
-            (scaleFactor - MIN_SCALE) /
-                (1 - MIN_SCALE) * (1 - MIN_ALPHA));
-
-      } else { // (1,+Infinity]
-        // This page is way off-screen to the right.
-        view.setAlpha(0);
-      }
-    }
-  }
-
 }

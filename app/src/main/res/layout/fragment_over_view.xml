@@ -213,10 +213,22 @@
                 android:layout_gravity="center"
                 android:id="@+id/generes_parent"
                 android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/generesTextViews"
+                    android:layout_width="wrap_content"
+                    android:padding="6dp"
+                    android:textSize="15sp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textColor="@color/md_white_1000"
+                    android:background="@drawable/rounded_bg"
+                    android:layout_height="wrap_content"/>
             </LinearLayout>
 
             <android.support.v7.widget.CardView
                 android:layout_gravity="center"
+                android:id="@+id/card_tag_line"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
@@ -236,6 +248,7 @@
 
             <android.support.v7.widget.CardView
                 android:layout_gravity="center"
+                android:id="@+id/card_overview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
