@@ -51,7 +51,7 @@ public class MovieCastAdapter extends RecyclerView.Adapter<MovieCastAdapter.Movi
         String imageurl = Constants.IMAGE_BASE_URL+cast.getProfilePath();
         //holder.mName.setText(currentMovie.getTitle());
         Picasso.with(mContext).load(imageurl)
-            .placeholder(R.drawable.default_movie ).into
+            .placeholder(R.drawable.default_profile ).into
             (holder.mProfilePic);
        /* holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
