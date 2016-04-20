@@ -3,7 +3,6 @@ package in.mobileappdev.moviesdb.ui.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,7 +12,6 @@ import android.view.ViewGroup;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -34,13 +32,15 @@ import in.mobileappdev.moviesdb.utils.BusProvider;
 public class MovieCastAndCrewFragment extends Fragment {
 
   private static final String ARG_PARAM1 = "movieId";
-  private long mMovieID;
-  @Bind(R.id.cast_list) RecyclerView mCastRecyclerView;
-  @Bind(R.id.crew_list) RecyclerView mCrewRecyclerView;
+  @Bind(R.id.cast_list)
+  RecyclerView mCastRecyclerView;
+  @Bind(R.id.crew_list)
+  RecyclerView mCrewRecyclerView;
   MovieCastAdapter movieCastAdapter;
   ArrayList<Cast> mCastDataSet = new ArrayList<Cast>();
   MovieCrewAdapter mMovieCrewAdapter;
   ArrayList<Crew> mCrewDataSet = new ArrayList<Crew>();
+  private long mMovieID;
 
 
   public MovieCastAndCrewFragment() {
@@ -58,7 +58,6 @@ public class MovieCastAndCrewFragment extends Fragment {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    BusProvider.getInstance().register(this);
     if (getArguments() != null) {
       mMovieID = getArguments().getLong(ARG_PARAM1);
     }
@@ -70,6 +69,8 @@ public class MovieCastAndCrewFragment extends Fragment {
     View view = inflater.inflate(R.layout.fragment_cast_and_crew, container, false);
     ButterKnife.bind(this, view);
     mCastRecyclerView.setHasFixedSize(true);
+    mCrewRecyclerView.setNestedScrollingEnabled(false);
+    mCastRecyclerView.setNestedScrollingEnabled(false);
     LinearLayoutManager layoutManager
         = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
     mCastRecyclerView.setLayoutManager(layoutManager);
@@ -87,11 +88,18 @@ public class MovieCastAndCrewFragment extends Fragment {
   }
 
   @Subscribe
-  public void getCastDetails(Credits credits){
+  public void getCastDetails(Credits credits) {
     mCastDataSet.addAll(credits.getCast());
     movieCastAdapter.notifyDataSetChanged();
     mCrewDataSet.addAll(credits.getCrew());
     mMovieCrewAdapter.notifyDataSetChanged();
+  }
+
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    BusProvider.getInstance().register(this);
   }
 
   @Override

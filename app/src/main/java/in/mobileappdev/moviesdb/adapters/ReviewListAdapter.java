@@ -7,16 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.android.youtube.player.YouTubeInitializationResult;
-import com.google.android.youtube.player.YouTubeThumbnailLoader;
-import com.google.android.youtube.player.YouTubeThumbnailView;
-
 import java.util.List;
 
 import in.mobileappdev.moviesdb.R;
 import in.mobileappdev.moviesdb.models.ReviewResult;
-import in.mobileappdev.moviesdb.models.TrailerResult;
-import in.mobileappdev.moviesdb.utils.Constants;
+
 
 /**
  * Created by satyanarayana.avv on 08-02-2016.

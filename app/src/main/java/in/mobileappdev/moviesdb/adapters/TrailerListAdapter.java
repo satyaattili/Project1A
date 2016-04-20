@@ -2,26 +2,17 @@ package in.mobileappdev.moviesdb.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.android.youtube.player.YouTubeInitializationResult;
-import com.google.android.youtube.player.YouTubeThumbnailLoader;
-import com.google.android.youtube.player.YouTubeThumbnailView;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.Inflater;
 
 import in.mobileappdev.moviesdb.R;
-import in.mobileappdev.moviesdb.models.Movie;
-import in.mobileappdev.moviesdb.models.Result;
 import in.mobileappdev.moviesdb.models.TrailerResult;
 import in.mobileappdev.moviesdb.utils.Constants;
 
@@ -51,26 +42,28 @@ public class TrailerListAdapter extends RecyclerView.Adapter<TrailerListAdapter.
   }
 
 
-
   @Override
-  public void onBindViewHolder(TrailerViewHolder holder, final int position) {
+  public void onBindViewHolder(final TrailerViewHolder holder, int position) {
 
-    final TrailerResult currentTrailer= mMovieDataSet.get(position);
+    final TrailerResult currentTrailer = mMovieDataSet.get(holder.getAdapterPosition());
     holder.itemView.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-    if(mOnTrailerClickedListener != null){
-      mOnTrailerClickedListener.onTrailerClicked(position, currentTrailer.getKey());
-    }
+        if (mOnTrailerClickedListener != null) {
+          mOnTrailerClickedListener.onTrailerClicked(holder.getAdapterPosition(),
+              currentTrailer.getKey());
+        }
       }
     });
-    holder.mThumbnail.setTag(currentTrailer.getKey());
-    holder.mThumbnail.initialize(Constants.YOUTUBE_VIDEO_API_KEY, new ThumbnailListener());
+    String url = Constants.VIDEO_THUMBNAIL + currentTrailer.getKey() + "/hqdefault.jpg";
+    Picasso.with(mContext).load(url)
+        .placeholder(R.drawable.default_video_thubnail).into
+        (holder.mThumbnail);
 
   }
 
 
-  public void setOnTrailerClickedListener(OnTrailerSelectedListener onTrailerClickedListener){
+  public void setOnTrailerClickedListener(OnTrailerSelectedListener onTrailerClickedListener) {
     this.mOnTrailerClickedListener = onTrailerClickedListener;
   }
 
@@ -79,58 +72,26 @@ public class TrailerListAdapter extends RecyclerView.Adapter<TrailerListAdapter.
     return mMovieDataSet.size();
   }
 
-  public class TrailerViewHolder  extends RecyclerView.ViewHolder{
-    protected TextView mName;
-    protected YouTubeThumbnailView mThumbnail;
-
-    public TrailerViewHolder(View v) {
-      super(v);
-      mName =  (TextView) v.findViewById(R.id.video_name);
-      mThumbnail = (YouTubeThumbnailView)  v.findViewById(R.id.thumbnail);
-
-    }
+  public void setOnMovieClickListener(OnMovieClickListener onMovieClickListener) {
+    this.mOnMovieClickListener = onMovieClickListener;
   }
 
-  public void setOnMovieClickListener(OnMovieClickListener onMovieClickListener){
-    this.mOnMovieClickListener =  onMovieClickListener;
-  }
-
-  public interface OnMovieClickListener{
+  public interface OnMovieClickListener {
     public void onMovieClick(String movieName, int movieId);
   }
 
-  private final class ThumbnailListener implements
-      YouTubeThumbnailView.OnInitializedListener,
-      YouTubeThumbnailLoader.OnThumbnailLoadedListener {
-
-    @Override
-    public void onInitializationSuccess(
-        YouTubeThumbnailView view, YouTubeThumbnailLoader loader) {
-      loader.setOnThumbnailLoadedListener(this);
-    //  thumbnailViewToLoaderMap.put(view, loader);
-      view.setImageResource(R.drawable.loading_thumbnail);
-      String videoId = (String) view.getTag();
-      loader.setVideo(videoId);
-    }
-
-    @Override
-    public void onInitializationFailure(
-        YouTubeThumbnailView view, YouTubeInitializationResult loader) {
-      view.setImageResource(R.drawable.no_thumbnail);
-    }
-
-    @Override
-    public void onThumbnailLoaded(YouTubeThumbnailView view, String videoId) {
-    }
-
-    @Override
-    public void onThumbnailError(YouTubeThumbnailView view, YouTubeThumbnailLoader.ErrorReason errorReason) {
-      view.setImageResource(R.drawable.no_thumbnail);
-    }
-
+  public interface OnTrailerSelectedListener {
+    public void onTrailerClicked(int id, String vidioId);
   }
 
-  public interface OnTrailerSelectedListener{
-        public void onTrailerClicked(int id, String vidioId);
+  public class TrailerViewHolder extends RecyclerView.ViewHolder {
+    protected ImageView mThumbnail;
+
+    public TrailerViewHolder(View v) {
+      super(v);
+
+      mThumbnail = (ImageView) v.findViewById(R.id.thumbnail);
+
+    }
   }
 }

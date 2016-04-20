@@ -2,11 +2,14 @@ package in.mobileappdev.moviesdb.services;
 
 import in.mobileappdev.moviesdb.models.Credits;
 import in.mobileappdev.moviesdb.models.MovieDetailsResponse;
+import in.mobileappdev.moviesdb.models.MovieImages;
 import in.mobileappdev.moviesdb.models.MovieResponse;
 import in.mobileappdev.moviesdb.models.ReviewResponse;
 import in.mobileappdev.moviesdb.models.VideosResponse;
+import in.mobileappdev.moviesdb.utils.Constants;
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -15,13 +18,16 @@ import retrofit2.http.Query;
  */
 public interface CallMoviesAPI {
     //@GET("discover/movie?sort_by=popularity.desc")
+    @Headers("Cache-Control: max-age=640000")
     @GET("movie/popular")
     Call<MovieResponse> getPopularLatestMovies(@Query("page") int pageId,@Query("api_key") String
         apiKey);
 
+    @Headers("Cache-Control: max-age=640000")
     @GET("movie/latest")
     Call<MovieResponse> getLatestMovies(@Query("page") int pageId,@Query("api_key") String apiKey);
 
+    @Headers("Cache-Control: max-age=640000")
     @GET("movie/top_rated")
     Call<MovieResponse> getTopRatedtMovies(@Query("page") int pageId,@Query("api_key") String
         apiKey);
@@ -45,6 +51,11 @@ public interface CallMoviesAPI {
     @GET("movie/{id}/credits")
     Call<Credits> getCredits(@Path("id") long movieId, @Query("api_key") String
         apiKey);
+
+    @GET("movie/{id}/images")
+    Call<MovieImages> getMovieImages(@Path("id") long movieId, @Query("api_key") String
+        apiKey);
+
 
 
 }
