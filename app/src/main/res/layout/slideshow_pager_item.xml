@@ -3,9 +3,11 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
-    <ImageView android:layout_width="match_parent" android:layout_height="match_parent"
-    android:id="@+id/slide_image"
-    android:fitsSystemWindows="true"
-    android:scaleType="centerCrop"/>
+    <ImageView
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:id="@+id/slide_image"
+        android:background="@drawable/image_placeholder"
+        android:fitsSystemWindows="true"
+        android:scaleType="centerCrop"/>
 
 </LinearLayout>

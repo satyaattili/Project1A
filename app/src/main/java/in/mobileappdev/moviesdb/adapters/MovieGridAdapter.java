@@ -51,7 +51,7 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
         String imageurl = Constants.IMAGE_BASE_URL+currentMovie.getPosterPath();
         //holder.mName.setText(currentMovie.getTitle());
         Picasso.with(mContext).load(imageurl)
-            .placeholder(R.drawable.default_movie ).into
+            .placeholder(R.drawable.thumbnail_placeholder ).into
             (holder.mThumbnail);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

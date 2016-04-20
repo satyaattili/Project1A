@@ -50,7 +50,7 @@ public class SlideShowPagerAdapter extends PagerAdapter {
     position = (int)(Math.random() * movieImages.getBackdrops().size());
     String imageUrl = Constants.IMAGE_BASE_URL+movieImages.getBackdrops().get(position).getFilePath();
     ImageView imageView = (ImageView) itemView.findViewById(R.id.slide_image);
-    Picasso.with(mContext).load(imageUrl).placeholder(R.drawable.ic_launcher)
+    Picasso.with(mContext).load(imageUrl).placeholder(R.drawable.image_placeholder)
         .into
             (imageView);
 

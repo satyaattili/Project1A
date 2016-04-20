@@ -3,10 +3,8 @@ package in.mobileappdev.moviesdb.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -24,9 +22,12 @@ import retrofit2.Response;
 public class MovieDetailViewActivity extends AppCompatActivity {
 
   private static final String TAG = MovieDetailViewActivity.class.getSimpleName();
-  @Bind(R.id.toolbar)  Toolbar mToolBar;
-  @Bind(R.id.collapsing_toolbar)  CollapsingToolbarLayout mCollapsingToolBarLayout;
-  @Bind(R.id.image_slideshow_pager)  AutoScrollViewPager mSlideShowViewPager;
+  @Bind(R.id.toolbar)
+  Toolbar mToolBar;
+  @Bind(R.id.collapsing_toolbar)
+  CollapsingToolbarLayout mCollapsingToolBarLayout;
+  @Bind(R.id.image_slideshow_pager)
+  AutoScrollViewPager mSlideShowViewPager;
   Callback<MovieImages> imagesCallback = new Callback<MovieImages>() {
     @Override
     public void onResponse(Call<MovieImages> call, Response<MovieImages> response) {

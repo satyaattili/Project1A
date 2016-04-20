@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,10 +47,12 @@ public class MovieDetailsFragment extends Fragment {
   TabLayout tabLayout;
   private ViewPagerAdapter adapter;
   private long mMovieId;
+  private String mMovieName;
+
   Callback<ReviewResponse> reviewResponseCallback = new Callback<ReviewResponse>() {
     @Override
     public void onResponse(Call<ReviewResponse> call, Response<ReviewResponse> response) {
-      if(isAdded()){
+      if (isAdded()) {
         if (response.body() != null && response.body().getResults().size() > 0) {
           adapter.addFragment(MovieReviewsFragment.newInstance(mMovieId),
               getString(R.string.reviews));
@@ -83,6 +84,7 @@ public class MovieDetailsFragment extends Fragment {
 
     }
   };
+
   Callback<Credits> creditsCallback = new Callback<Credits>() {
     @Override
     public void onResponse(Call<Credits> call, Response<Credits> response) {
@@ -133,7 +135,6 @@ public class MovieDetailsFragment extends Fragment {
 
     }
   };
-  private String mMovieName;
 
   public MovieDetailsFragment() {
     // Required empty public constructor
@@ -272,5 +273,6 @@ public class MovieDetailsFragment extends Fragment {
       return mFragmentTitleList.get(position);
     }
   }
+
 
 }
