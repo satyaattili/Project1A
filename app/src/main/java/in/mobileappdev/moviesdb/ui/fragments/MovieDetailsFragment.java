@@ -233,26 +233,6 @@ public class MovieDetailsFragment extends Fragment {
     BusProvider.getInstance().register(this);
   }
 
-  /*Callback<Type> retrofitCallBAck = new Callback<Type>() {
-    @Override
-    public void onResponse(Call<Type> call, Response<Type> response) {
-
-      if(response != null && response.body() instanceof Credits)
-
-      if( response.body()!=null && ((Credits)response.body()).getCast().size()>0){
-        adapter.addFragment(MovieCastAndCrewFragment.newInstance(mMovieId), "CAST");
-        adapter.notifyDataSetChanged();
-        BusProvider.getInstance().post(response.body());
-      }
-    }
-
-    @Override
-    public void onFailure(Call<Type> call, Throwable t) {
-
-    }
-  };
-*/
-
   @Override
   public void onStop() {
     super.onStop();
@@ -293,12 +273,4 @@ public class MovieDetailsFragment extends Fragment {
     }
   }
 
-
-  @Override
-  public void setUserVisibleHint(boolean isVisibleToUser) {
-    super.setUserVisibleHint(isVisibleToUser);
-    Log.e(TAG,"setUserVisibleHint");
-
-    Toast.makeText(getActivity(), "Shoe visible hint", Toast.LENGTH_SHORT).show();
-  }
 }
