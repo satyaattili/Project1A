@@ -50,7 +50,7 @@ public class DashboardActivity extends AppCompatActivity implements
   }
 
   @Override
-  public void onMovieSelected(long mid, String movieName) {
+  public void onMovieSelected(long mid, String movieName, String posterPath) {
 
 /*    if(!Utils.hasNetworkConnection(this)){
       Snackbar.make(findViewById(R.id.parentlayout), R.string.no_network_msg, Snackbar
@@ -64,16 +64,22 @@ public class DashboardActivity extends AppCompatActivity implements
     }*/
 
     if (articleFrag != null) {
-        if(mMovieSelected != mid){
-          mMovieSelected = mid;
-          articleFrag.updateArticleView(mid);
-          mToolBar.setTitle(movieName);
-        }
+      if (mMovieSelected != mid) {
+        mMovieSelected = mid;
+        articleFrag.updateArticleView(mid);
+        mToolBar.setTitle(movieName);
+      }
     } else {
+      if (Utils.hasNetworkConnection(this)) {
         Intent detailsActivity = new Intent(DashboardActivity.this, MovieDetailViewActivity.class);
         detailsActivity.putExtra("movie_id", mid);
         detailsActivity.putExtra("movie_name", movieName);
+        detailsActivity.putExtra("movie_poster", posterPath);
         startActivity(detailsActivity);
+      } else {
+        Snackbar.make(findViewById(R.id.parentlayout), R.string.no_network_msg, Snackbar
+            .LENGTH_LONG).show();
+      }
     }
   }
 

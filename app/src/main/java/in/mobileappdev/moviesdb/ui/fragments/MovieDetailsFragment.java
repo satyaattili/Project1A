@@ -39,6 +39,7 @@ public class MovieDetailsFragment extends Fragment {
   private static final String ARG_PARAM1 = "mid";
   private static final String ARG_PARAM2 = "mname";
   private static final String TAG = MovieDetailsFragment.class.getSimpleName();
+  private static final String ARG_PARAM3 = "poster";
   @Bind(R.id.overview_loading)
   ProgressBar mProgressLoading;
   @Bind(R.id.viewpager)
@@ -48,6 +49,7 @@ public class MovieDetailsFragment extends Fragment {
   private ViewPagerAdapter adapter;
   private long mMovieId;
   private String mMovieName;
+  private String mMoviePoster;
 
   Callback<ReviewResponse> reviewResponseCallback = new Callback<ReviewResponse>() {
     @Override
@@ -140,11 +142,12 @@ public class MovieDetailsFragment extends Fragment {
     // Required empty public constructor
   }
 
-  public static MovieDetailsFragment newInstance(long mid, String mname) {
+  public static MovieDetailsFragment newInstance(long mid, String mname, String poster) {
     MovieDetailsFragment fragment = new MovieDetailsFragment();
     Bundle args = new Bundle();
     args.putLong(ARG_PARAM1, mid);
     args.putString(ARG_PARAM2, mname);
+    args.putString(ARG_PARAM3, poster);
     fragment.setArguments(args);
     return fragment;
   }
@@ -156,6 +159,7 @@ public class MovieDetailsFragment extends Fragment {
     if (getArguments() != null) {
       mMovieId = getArguments().getLong(ARG_PARAM1);
       mMovieName = getArguments().getString(ARG_PARAM2);
+      mMoviePoster = getArguments().getString(ARG_PARAM3);
     }
   }
 
@@ -219,7 +223,7 @@ public class MovieDetailsFragment extends Fragment {
       } else {
         item.setChecked(true);
         item.setIcon(R.drawable.ic_action_favorite);
-        DatabaseHandler.getInstance(getActivity()).addToFavorites(mMovieId);
+        DatabaseHandler.getInstance(getActivity()).addToFavorites(mMovieId, mMovieName, mMoviePoster);
         Snackbar.make(getView(), R.string.added_to_fav, Snackbar.LENGTH_SHORT).show();
       }
     } else if (id == android.R.id.home) {

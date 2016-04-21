@@ -3,10 +3,10 @@ apply plugin: 'com.android.databinding'
 
 android {
   compileSdkVersion 23
-  buildToolsVersion "23.0.2"
+  buildToolsVersion "23.0.3"
 
   defaultConfig {
-    applicationId "in.mobileappdev.project1"
+    applicationId "in.mobileappdev.moviesdb"
     minSdkVersion 15
     targetSdkVersion 23
     versionCode 1

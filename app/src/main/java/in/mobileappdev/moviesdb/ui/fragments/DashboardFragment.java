@@ -11,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,12 @@ public class DashboardFragment extends Fragment {
   @Bind(R.id.movie_cat_tabs) TabLayout mMoviewCategoryTabLayout;
   @Bind(R.id.dashboard_viewpager) ViewPager mCategoryViewPager;
   private ViewPagerAdapter adapter;
+
+  private int[] tabIcons = {
+      R.drawable.ic_action_favorite,
+      R.drawable.ic_action_favorite,
+      R.drawable.ic_action_favorite
+  };
 
   public DashboardFragment() {
     // Required empty public constructor
@@ -58,11 +65,22 @@ public class DashboardFragment extends Fragment {
     mMoviewCategoryTabLayout.setSmoothScrollingEnabled(true);
     adapter = new ViewPagerAdapter(getChildFragmentManager());
     mCategoryViewPager.setAdapter(adapter);
-    adapter.addFragment(MovieListFragment.newInstance(1), "Popular");
-    adapter.addFragment(MovieListFragment.newInstance(2), "Top Rated");
-    //adapter.addFragment(MovieListFragment.newInstance(1), "Favorites");
+    adapter.addFragment(MovieListFragment.newInstance(1), getString(R.string.filter_popular));
+    adapter.addFragment(MovieListFragment.newInstance(2), getString(R.string.filter_toprated));
+    adapter.addFragment(FavoritesFragment.newInstance(), getString(R.string.filter_favorites));
     adapter.notifyDataSetChanged();
     mMoviewCategoryTabLayout.setupWithViewPager(mCategoryViewPager);
+    //setupTabIcons();
+  }
+
+
+  /**
+   * Not used
+   */
+  private void setupTabIcons() {
+    mMoviewCategoryTabLayout.getTabAt(0).setIcon(tabIcons[0]);
+    mMoviewCategoryTabLayout.getTabAt(1).setIcon(tabIcons[1]);
+    mMoviewCategoryTabLayout.getTabAt(2).setIcon(tabIcons[2]);
   }
 
   class ViewPagerAdapter extends FragmentStatePagerAdapter {

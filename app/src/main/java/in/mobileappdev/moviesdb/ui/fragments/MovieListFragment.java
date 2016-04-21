@@ -93,6 +93,7 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
   @Override
   public void onResume() {
     super.onResume();
+    mMovieRecyclerView.setAdapter(mMovieAdapter);
   }
 
   private void initviews() {
@@ -100,6 +101,14 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
     mMovieRecyclerView.setHasFixedSize(true);
     final GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
     mMovieRecyclerView.setLayoutManager(gridLayoutManager);
+
+    mMovieAdapter = new MovieGridAdapter(getActivity(), movies);
+    mMovieAdapter.setOnMovieClickListener(new MovieGridAdapter.OnMovieClickListener() {
+      @Override
+      public void onMovieClick(String movieName, int movieId, String posterPath) {
+        mOnMovieSelectedListener.onMovieSelected(movieId, movieName, posterPath);
+      }
+    });
 
     //animation
     RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
@@ -131,15 +140,6 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
       }
     });
 
-    mMovieAdapter = new MovieGridAdapter(getActivity(), movies);
-    mMovieAdapter.setOnMovieClickListener(new MovieGridAdapter.OnMovieClickListener() {
-      @Override
-      public void onMovieClick(String movieName, int movieId) {
-        mOnMovieSelectedListener.onMovieSelected(movieId, movieName);
-      }
-    });
-
-    mMovieRecyclerView.setAdapter(mMovieAdapter);
     mProgressBar.setVisibility(View.VISIBLE);
 
     switch (cid) {
@@ -298,6 +298,6 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
 
 
   public interface OnMovieSelectedListener {
-    public void onMovieSelected(long mId, String mName);
+    public void onMovieSelected(long mId, String mName,String posterPath);
   }
 }

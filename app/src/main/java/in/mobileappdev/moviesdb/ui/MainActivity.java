@@ -68,10 +68,11 @@ public class MainActivity extends AppCompatActivity implements Callback<MovieRes
         mMovieAdapter= new MovieGridAdapter(this, movies);
         mMovieAdapter.setOnMovieClickListener(new MovieGridAdapter.OnMovieClickListener() {
           @Override
-          public void onMovieClick(String movieName, int movieId) {
+          public void onMovieClick(String movieName, int movieId, String poster) {
             Intent detailsActivity = new Intent(MainActivity.this, MovieDetailViewActivity.class);
             detailsActivity.putExtra("movie_id", movieId);
             detailsActivity.putExtra("movie_name", movieName);
+            detailsActivity.putExtra("movie_poster", poster);
             startActivity(detailsActivity);
           }
         });

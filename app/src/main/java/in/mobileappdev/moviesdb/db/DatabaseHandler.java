@@ -10,15 +10,17 @@ import android.util.Log;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
 
-  private static final int DATABASE_VERSION = 1;
+  private static final int DATABASE_VERSION = 2;
   private static final String DATABASE_NAME = "in.mobileappdev.md";
   private static final String TABLE_FAVORITES = "favorites";
   private static final String TAG = DatabaseHandler.class.getSimpleName();
   private static DatabaseHandler mInstance;
 
   // Contacts Table Columns names
-  private static final String KEY_ID = "id";
-  private static final String KEY_MOVIE_ID = "name";
+  public static final String KEY_ID = "id";
+  public static final String KEY_MOVIE_ID = "movie_id";
+  public static final String KEY_MOVIE_NAME = "movie_title";
+  public static final String KEY_MOVIE_POSTER = "movie_poster";
 
   public DatabaseHandler(Context context) {
     super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -42,7 +44,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
   @Override
   public void onCreate(SQLiteDatabase db) {
     String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_FAVORITES + "("
-        + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MOVIE_ID + " LONG UNIQUE" + ")";
+        + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MOVIE_ID + " LONG UNIQUE,"  + KEY_MOVIE_NAME +
+        " TEXT,"  + KEY_MOVIE_POSTER + " TEXT "+ ")";
+   Log.d(TAG, "Create table : "+CREATE_CONTACTS_TABLE);
     db.execSQL(CREATE_CONTACTS_TABLE);
   }
 
@@ -57,10 +61,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
    */
 
   // Adding new contact
-  public void addToFavorites(long movieId) {
+  public void addToFavorites(long movieId, String title, String poster) {
     SQLiteDatabase db = this.getWritableDatabase();
     ContentValues values = new ContentValues();
     values.put(KEY_MOVIE_ID, movieId);
+    values.put(KEY_MOVIE_NAME, title);
+    values.put(KEY_MOVIE_POSTER, poster);
     db.insert(TABLE_FAVORITES, null, values);
     db.close();
   }
@@ -72,7 +78,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         new String[] { String.valueOf(movieId) });
     db.close();
   }
-
+  String[] args = { "first string", "second@string.com" };
 
   public boolean isExistsInFavorites(long id) {
     SQLiteDatabase db = this.getReadableDatabase();
@@ -84,6 +90,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
       return true;
     }
     return false;
+  }
+
+  public Cursor getAllFavoriteMovies() {
+    SQLiteDatabase db = this.getReadableDatabase();
+    Cursor cursor =
+        db.query(TABLE_FAVORITES, new String[]{KEY_MOVIE_ID, KEY_MOVIE_NAME, KEY_MOVIE_POSTER},
+            null,
+            null, null, null, null, null);
+    Log.d(TAG, "Cursor count : " + cursor.getCount());
+    return cursor;
   }
 
 
