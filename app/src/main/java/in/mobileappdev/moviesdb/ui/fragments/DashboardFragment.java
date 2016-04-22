@@ -11,7 +11,6 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +25,10 @@ import in.mobileappdev.moviesdb.R;
  */
 public class DashboardFragment extends Fragment {
 
-  @Bind(R.id.movie_cat_tabs) TabLayout mMoviewCategoryTabLayout;
-  @Bind(R.id.dashboard_viewpager) ViewPager mCategoryViewPager;
+  @Bind(R.id.movie_cat_tabs)
+  TabLayout mMoviewCategoryTabLayout;
+  @Bind(R.id.dashboard_viewpager)
+  ViewPager mCategoryViewPager;
   private ViewPagerAdapter adapter;
 
   private int[] tabIcons = {
@@ -40,8 +41,8 @@ public class DashboardFragment extends Fragment {
     // Required empty public constructor
   }
 
-  public static DashboardFragment newInstance(){
-   return new DashboardFragment();
+  public static DashboardFragment newInstance() {
+    return new DashboardFragment();
 
   }
 
@@ -106,7 +107,7 @@ public class DashboardFragment extends Fragment {
       mFragmentTitleList.add(title);
     }
 
-    public void clearFragments(){
+    public void clearFragments() {
       mFragmentList.clear();
       mFragmentTitleList.clear();
     }

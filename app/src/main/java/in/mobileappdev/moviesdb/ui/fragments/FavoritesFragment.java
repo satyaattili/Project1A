@@ -102,7 +102,7 @@ public class FavoritesFragment extends Fragment {
 
       adapter.setOnMovieClickListener(new FavoritesGridAdapter.OnMovieClickListener() {
         @Override
-        public void onMovieClick(String movieName, int movieId, String posterPath) {
+        public void onMovieClick(String movieName, long movieId, String posterPath) {
           mOnMovieSelectedListener.onMovieSelected(movieId, movieName, posterPath);
         }
       });

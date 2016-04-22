@@ -19,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.squareup.otto.Subscribe;
+
 import java.util.ArrayList;
 
 import butterknife.Bind;
@@ -30,6 +32,7 @@ import in.mobileappdev.moviesdb.models.MovieResponse;
 import in.mobileappdev.moviesdb.models.Result;
 import in.mobileappdev.moviesdb.rest.MovieDBApiHelper;
 import in.mobileappdev.moviesdb.services.CallMoviesAPI;
+import in.mobileappdev.moviesdb.utils.BusProvider;
 import in.mobileappdev.moviesdb.utils.Constants;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -93,7 +96,20 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
   @Override
   public void onResume() {
     super.onResume();
-    mMovieRecyclerView.setAdapter(mMovieAdapter);
+    mMovieAdapter.notifyDataSetChanged();
+  }
+
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    BusProvider.getInstance().register(this);
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    BusProvider.getInstance().unregister(this);
   }
 
   private void initviews() {
@@ -109,6 +125,9 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
         mOnMovieSelectedListener.onMovieSelected(movieId, movieName, posterPath);
       }
     });
+
+
+    mMovieRecyclerView.setAdapter(mMovieAdapter);
 
     //animation
     RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
@@ -168,6 +187,7 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
     });
 
   }
+
 
   private void getMore(int page) {
     switch (MovieDBApplication.getInstance()
@@ -296,8 +316,13 @@ public class MovieListFragment extends Fragment implements Callback<MovieRespons
     }
   }
 
+  @Subscribe
+  public void favActionRecieved(Boolean fav) {
+    mMovieAdapter.notifyDataSetChanged();
+  }
+
 
   public interface OnMovieSelectedListener {
-    public void onMovieSelected(long mId, String mName,String posterPath);
+    public void onMovieSelected(long mId, String mName, String posterPath);
   }
 }

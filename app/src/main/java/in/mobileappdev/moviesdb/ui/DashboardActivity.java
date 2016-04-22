@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -20,11 +19,14 @@ import in.mobileappdev.moviesdb.utils.Utils;
  * Satya Attili
  */
 public class DashboardActivity extends AppCompatActivity implements
-    MovieListFragment.OnMovieSelectedListener{
+    MovieListFragment.OnMovieSelectedListener {
 
-  private MovieDetailsFragment articleFrag;
-  @Bind(R.id.toolbar) Toolbar mToolBar;
+  @Bind(R.id.toolbar)
+  Toolbar mToolBar;
   long mMovieSelected = -1;
+  private MovieDetailsFragment articleFrag;
+  private DashboardFragment listFragment;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -38,12 +40,12 @@ public class DashboardActivity extends AppCompatActivity implements
         return;
       }
 
-      DashboardFragment listFragment = DashboardFragment.newInstance();
+      listFragment = DashboardFragment.newInstance();
       listFragment.setArguments(getIntent().getExtras());
 
       getSupportFragmentManager().beginTransaction()
           .add(R.id.fragment_container, listFragment).commit();
-    }else{
+    } else {
       articleFrag = (MovieDetailsFragment)
           getSupportFragmentManager().findFragmentById(R.id.article_fragment);
     }
@@ -66,7 +68,7 @@ public class DashboardActivity extends AppCompatActivity implements
     if (articleFrag != null) {
       if (mMovieSelected != mid) {
         mMovieSelected = mid;
-        articleFrag.updateArticleView(mid);
+        articleFrag.updateArticleView(mid, movieName, posterPath);
         mToolBar.setTitle(movieName);
       }
     } else {
@@ -82,5 +84,4 @@ public class DashboardActivity extends AppCompatActivity implements
       }
     }
   }
-
 }

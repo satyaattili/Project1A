@@ -48,9 +48,6 @@ public class MovieDetailsFragment extends Fragment {
   TabLayout tabLayout;
   private ViewPagerAdapter adapter;
   private long mMovieId;
-  private String mMovieName;
-  private String mMoviePoster;
-
   Callback<ReviewResponse> reviewResponseCallback = new Callback<ReviewResponse>() {
     @Override
     public void onResponse(Call<ReviewResponse> call, Response<ReviewResponse> response) {
@@ -86,7 +83,6 @@ public class MovieDetailsFragment extends Fragment {
 
     }
   };
-
   Callback<Credits> creditsCallback = new Callback<Credits>() {
     @Override
     public void onResponse(Call<Credits> call, Response<Credits> response) {
@@ -137,6 +133,8 @@ public class MovieDetailsFragment extends Fragment {
 
     }
   };
+  private String mMovieName;
+  private String mMoviePoster;
 
   public MovieDetailsFragment() {
     // Required empty public constructor
@@ -180,8 +178,10 @@ public class MovieDetailsFragment extends Fragment {
 
   }
 
-  public void updateArticleView(long position) {
+  public void updateArticleView(long position, String title, String poster) {
     mMovieId = position;
+    mMovieName = title;
+    mMoviePoster = poster;
     adapter.clearFragments();
     setupViewPager(viewPager, position);
     if (adapter != null) {
@@ -194,6 +194,7 @@ public class MovieDetailsFragment extends Fragment {
         (overViewResponseCallback);
     adapter = new ViewPagerAdapter(getChildFragmentManager());
     viewPager.setAdapter(adapter);
+    getActivity().invalidateOptionsMenu();
   }
 
   @Override
@@ -211,6 +212,7 @@ public class MovieDetailsFragment extends Fragment {
     super.onPrepareOptionsMenu(menu);
   }
 
+
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     int id = item.getItemId();
@@ -220,11 +222,14 @@ public class MovieDetailsFragment extends Fragment {
         item.setIcon(R.drawable.ic_action_favorite_outline);
         DatabaseHandler.getInstance(getActivity()).deleteContact(mMovieId);
         Snackbar.make(getView(), R.string.deleted_from_fav, Snackbar.LENGTH_SHORT).show();
+        BusProvider.getInstance().post(false);
       } else {
         item.setChecked(true);
         item.setIcon(R.drawable.ic_action_favorite);
-        DatabaseHandler.getInstance(getActivity()).addToFavorites(mMovieId, mMovieName, mMoviePoster);
+        DatabaseHandler.getInstance(getActivity())
+            .addToFavorites(mMovieId, mMovieName, mMoviePoster);
         Snackbar.make(getView(), R.string.added_to_fav, Snackbar.LENGTH_SHORT).show();
+        BusProvider.getInstance().post(true);
       }
     } else if (id == android.R.id.home) {
       getActivity().onBackPressed();

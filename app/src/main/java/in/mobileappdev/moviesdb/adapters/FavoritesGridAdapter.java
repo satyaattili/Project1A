@@ -83,6 +83,6 @@ public class FavoritesGridAdapter extends CursorRecyclerViewAdapter<FavoritesGri
     }
 
     public interface OnMovieClickListener{
-        public void onMovieClick(String movieName, int movieId, String poster);
+        public void onMovieClick(String movieName, long movieId, String poster);
     }
 }
